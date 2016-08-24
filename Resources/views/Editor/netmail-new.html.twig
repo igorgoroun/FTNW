@@ -1,0 +1,57 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css?family=PT+Mono&subset=cyrillic-ext" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'FTNWBundle:Editor:netlistmenu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                <div class="page-header hidden-xs">
+                    <h1 class="bloghead"><small>new</small> Netmail</h1>
+                </div>
+                {{ form_start(form, {'attr': {'class':'form-horizontal'}}) }}
+                <div class="form-group">
+                    {{ form_label(form.hTo) }}
+                    <div class="col-xs-6 col-sm-5">
+                        {{ form_widget(form.hTo) }}
+                    </div>
+                    <div class="col-xs-6 col-sm-5">
+                        {{ form_widget(form.hToFtn) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.subject) }}
+                    <div class="col-sm-10">
+                        {{ form_widget(form.subject) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        {{ form_widget(form.body) }}
+                    </div>
+                </div>
+                {{ form_widget(form.save) }}
+                {{ form_end(form) }}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <blockquote class="blockquote-reverse">
+                            {{ point.origin }}
+                            <footer>FTNW-0.1-dev 2:466/4</footer>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

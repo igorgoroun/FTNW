@@ -1,0 +1,35 @@
+IgorGoroun\FTNWBundle\Entity\PointMessage:
+    type: entity
+    table: null
+    repositoryClass: IgorGoroun\FTNWBundle\Repository\PointMessageRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        created:
+            type: datetime
+        seen:
+            type: boolean
+    manyToOne:
+        point:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Point
+            inversedBy: echomail
+            joinColumn:
+              name: point_id
+              referencedColumnName: id
+        area:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Echoarea
+            inversedBy: pointpackets
+            joinColumn:
+              name: area_id
+              referencedColumnName: id
+        message:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\MessageCache
+            inversedBy: pointmessages
+            joinColumn:
+              name: message_id
+              referencedColumnName: id
+    lifecycleCallbacks: {  }

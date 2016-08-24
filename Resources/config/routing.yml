@@ -1,3 +1,78 @@
 ftnw_homepage:
     path:     /
-    defaults: { _controller: FTNWBundle:Default:index }
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: fidonews_editor
+        permanent: true
+
+fidonews_editor:
+    path: /echo
+    defaults: { _controller: FTNWBundle:Editor:groups }
+
+fidonews_group:
+    path: /echo/{group_id}
+    defaults: { _controller: FTNWBundle:Editor:group }
+    requirements:
+        group_id: \d+
+
+fidonews_message:
+    path: /echo/{group_id}/{message_number}
+    defaults: { _controller: FTNWBundle:Editor:message }
+    requirements:
+        group_id: \d+
+        message_number: \d+
+
+fidonews_post:
+    path: /echo/{id}/post
+    defaults: { _controller: FTNWBundle:Editor:post }
+    requirements:
+        id: \d+
+
+fidonews_reply:
+    path: /echo/{id}/reply
+    defaults: { _controller: FTNWBundle:Editor:reply }
+    requirements:
+        id: \d+
+
+netmail:
+    path: /netmail
+    defaults: { _controller: FTNWBundle:Editor:netmailcheck }
+
+netmail_message:
+    path: /netmail/{id}
+    defaults: { _controller: FTNWBundle:Editor:netmail }
+    requirements:
+        id: \d+
+
+netmail_post:
+    path: /netmail/post
+    defaults: { _controller: FTNWBundle:Editor:netmailPost }
+
+netmail_reply:
+    path: /netmail/{id}/reply
+    defaults: { _controller: FTNWBundle:Editor:netmailReply }
+    requirements:
+        id: \d+
+
+point_signin:
+    path: /signin
+    defaults: { _controller: FTNWBundle:Point:register }
+
+point_login:
+    path: /login
+    defaults: { _controller: FTNWBundle:Point:login }
+
+point_logout:
+    path: /logout
+    defaults: { _controller: FTNWBundle:Point:logout }
+
+rest_uplink_new:
+    path: /api/uplink/new
+    defaults: { _controller: FTNWBundle:Api:uplinkNew }
+    requirements:
+        methods: POST
+
+
+uplink_new:
+    path:     /api/uplink/new
+    defaults: { _controller: FTNWBundle:Api:uplinkNew }

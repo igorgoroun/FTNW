@@ -1,0 +1,33 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-1 col-md-4">
+                {{ form_start(form) }}
+
+                {{ form_errors(form) }}
+
+                {{ form_row(form.username) }}
+                {{ form_row(form.plainPassword.first) }}
+                {{ form_row(form.plainPassword.second) }}
+                {{ form_row(form.classic) }}
+
+                {{ form_widget(form.save) }}
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

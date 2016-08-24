@@ -1,0 +1,7 @@
+IgorGoroun\FTNWBundle\Entity\Point:
+    properties:
+        username:
+            - Regex: '/^[a-zA-Z\ ]+$/i'
+        plainPassword:
+            - NotBlank: ~
+

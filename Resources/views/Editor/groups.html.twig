@@ -1,0 +1,118 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css?family=PT+Mono&subset=cyrillic-ext" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'FTNWBundle:Editor:grouplistmenu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                {% if group_current is defined %}
+                    <div class="page-header hidden-xs">
+                        <div class="btn-group pull-right" role="group" aria-label="...">
+                            {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
+                            <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
+                            {% if message %}<a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>{% endif %}
+                            {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+                        </div>
+                        <h1 class="bloghead">
+                            {{ group_current.name }}
+                            {%  if nav %}
+                            <small>{{ nav.current }}/{{ nav.total }}</small>
+                            {% endif %}
+                        </h1>
+                    </div>
+                    {% if message %}
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <!--<div class="panel-heading">Panel heading</div>-->
+                        <table class="table table-condensed">
+                            <tr class="default">
+                                <td class="text-right"><strong>From:</strong></td>
+                                <td class="text-left">{{ message.hFrom }} <a class="btn btn-xs btn-default">{{ message.hFromFtn }}</a></td>
+                                <td class="text-left">{{ message.hDate|date('d M Y H:i O') }}</td>
+                            </tr>
+                            <tr class="default">
+                                <td class="text-right"><strong>To:</strong></td>
+                                <td class="text-left">{{ message.hTo }} {% if message.hToFtn %}<a class="btn btn-xs btn-default">{{ message.hToFtn }}</a>{% endif %}</td>
+                                <td class="text-left">
+                                </td>
+                            </tr>
+                            <tr class="default">
+                                <td class="text-right"><strong>Subject:</strong></td>
+                                <td colspan="2">{{ message.subject }}<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="collapse" id="collapseHeaders">
+                        <pre><code>{{ message.srcHeader }}</code></pre>
+                    </div>
+
+                    <div class="message_viewer">{{ message.body|raw }}</div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <p>
+                            <div class="btn-group" role="group" aria-label="...">
+                                {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
+                                <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
+                                <a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
+                                {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+                            </div>
+                            </p>
+
+                        </div>
+                        <div class="col-sm-8">
+                            <blockquote class="blockquote-reverse">
+                                {{ message.origin }}
+                                <footer>{{ message.pid }} {{ message.tid }}</footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="jumbotron">
+                        <h1>No messages</h1>
+                        <p><strong>{{ group_current.name }}</strong> has no messages yet :(</p>
+                        <p><a href="{{ path('fidonews_post',{'id':group_current.id}) }}" class="btn btn-primary btn-lg" role="button">Compose new</a></p>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="page-header">
+                        <h1 class="bloghead">FTNW 2:466/4</h1>
+                    </div>
+                    <div class="jumbotron">
+                        <h2>ftnwED 0.1-dev</h2>
+                        <p>Please select echoarea to read</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(function(){
+
+            //$("#message_body>code").text(parseText($("#message_body>code").text()));
+            //console.log($("#message_body>code").text());
+            function parseText(text) {
+                var rows = text.split('\n');
+                for (var i = 0; i < rows.length; i++) {
+                    if (rows[i].match(/[\s]{0,}[A-Za-z]{0,}[>]{1,}/) != null) {
+                        rows[i] = "<span>" + rows[i] + "</span>";
+                    }
+                }
+                return rows.join('\n');
+            }
+        });
+    </script>
+{% endblock %}

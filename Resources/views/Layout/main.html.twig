@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}/snake/fido{% endblock %}</title>
+    {% block stylesheets %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    {% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+    <link rel="stylesheet" href="{{ asset('style.css') }}" />
+</head>
+<body>
+    {% block header %}
+    <nav class="navbar navbar navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#ipg_nav" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="javascript:void(0);" class="navbar-brand consoleswitch" data-container="nav.navbar" data-toggle="popover" data-placement="right" data-content='<form action="" class="" role="search">
+                <input type="text" class="form-control" id="consoleinput" placeholder="command"></form><small id="consolehint">type <code>help</code> for commands list</small>'>/dev/snake</a>
+            </div>
+            <div class="collapse navbar-collapse" id="ipg_nav">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="{% if app.request.attributes.get('_route') starts with 'fidonews' %}active{% endif %}"><a href="{{ path('fidonews_editor') }}">ftnED</a></li>
+                    {% if is_granted('ROLE_USER') %}
+                     <li><a href="{{ path('point_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                    {% else %}
+                    <li class="{% if app.request.attributes.get('_route') ends with 'login' %}active{% endif %}"><a href="{{ path('point_login') }}"><span class="glyphicon glyphicon-log-in"></span></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% endblock %}
+
+    {% block body %}
+        {% for flash_message in app.session.flashbag.get('notice') %}
+            <div class="container"><div class="row"><div class="col-md-12"><div class="alert alert-dismissible alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ flash_message }}
+            </div></div></div></div>
+        {% endfor %}
+        {% for flash_message in app.session.flashbag.get('error') %}
+            <div class="container"><div class="row"><div class="col-md-12"><div class="alert alert-dismissible alert-danger">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ flash_message }}
+            </div></div></div></div>
+        {% endfor %}
+    {% endblock %}
+    
+    {% block javascripts %}
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+
+    </script>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,97 @@
+IgorGoroun\FTNWBundle\Entity\MessageCache:
+    type: entity
+    table: null
+    repositoryClass: IgorGoroun\FTNWBundle\Repository\MessageCacheRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        messageId:
+            type: string
+            length: '128'
+            unique: true
+            column: message_id
+        hFrom:
+            type: string
+            length: '32'
+            column: h_from
+        hFromRfc:
+            type: string
+            length: '64'
+            column: h_from_rfc
+        hFromFtn:
+            type: string
+            length: '32'
+            column: h_from_ftn
+        hTo:
+            type: string
+            length: '32'
+            column: h_to
+        hToFtn:
+            type: string
+            length: '32'
+            nullable: true
+            column: h_to_ftn
+        hToRfc:
+            type: string
+            length: '32'
+            nullable: true
+            column: h_to_rfc
+        hDate:
+            type: datetime
+            column: h_date
+        hFTNmid:
+            type: string
+            length: '8'
+            nullable: true
+        hFTNreply:
+            type: string
+            length: '8'
+            nullable: true
+        avatar:
+            type: string
+            length: '128'
+            nullable: true
+        subject:
+            type: string
+            length: '80'
+        tearline:
+            type: string
+            length: '80'
+            nullable: true
+        tid:
+            type: string
+            length: '64'
+            nullable: true
+        pid:
+            type: string
+            length: '64'
+            nullable: true
+        origin:
+            type: string
+            length: '128'
+            nullable: true
+        body:
+            type: text
+        srcHeader:
+            type: text
+            column: src_header
+        cachedAt:
+            type: datetime
+    manyToOne:
+      echoarea:
+        targetEntity: IgorGoroun\FTNWBundle\Entity\Echoarea
+        inversedBy: messages
+        joinColumn:
+          name: group_id
+          referencedColumnName: id
+    oneToMany:
+        pointmessages:
+          targetEntity: IgorGoroun\FTNWBundle\Entity\PointMessage
+          mappedBy: message
+
+    lifecycleCallbacks:
+        prePersist: [setCachedDate]

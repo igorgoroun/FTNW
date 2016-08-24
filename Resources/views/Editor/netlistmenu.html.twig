@@ -1,0 +1,24 @@
+
+<p>
+<div class="btn-group btn-group-justified visible-sm visible-xs" role="group" aria-label="...">
+    {% if nav.prev is defined %}<a href="{{ path('netmail_message',{'id':nav.prev}) }}" type="button" class="btn btn-primary">&larr;</a>{% endif %}
+    <a href="{{ path("netmail") }}" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> {% if nav is defined %} {{ nav.current }}/{{ nav.total }} {% endif %}</a>
+    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">Echoareas
+        <span class="caret"></span></a>
+    {% if nav.next is defined %}<a href="{{ path('netmail_message',{'id':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}
+</div>
+</p>
+<div class="collapse" id="collapseAreas">
+    <div class="list-group">
+        {% for group in groups %}
+            <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="list-group hidden-xs hidden-sm">
+    <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}NETMAIL</a>
+    {% for group in groups %}
+        <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
+    {% endfor %}
+</div>

@@ -1,0 +1,29 @@
+IgorGoroun\FTNWBundle\Entity\Subscription:
+    type: entity
+    table: null
+    repositoryClass: IgorGoroun\FTNWBundle\Repository\SubscriptionRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        created:
+            type: datetime
+    manyToOne:
+        point:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Point
+            inversedBy: subscriptions
+            joinColumn:
+              name: point_id
+              referencedColumnName: id
+        area:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Echoarea
+            inversedBy: subscriptions
+            joinColumn:
+              name: area_id
+              referencedColumnName: id
+
+    lifecycleCallbacks:
+        prePersist: [setCreatedValue]

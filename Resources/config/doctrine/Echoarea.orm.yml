@@ -1,0 +1,26 @@
+IgorGoroun\FTNWBundle\Entity\Echoarea:
+    type: entity
+    table: null
+    repositoryClass: IgorGoroun\FTNWBundle\Repository\EchoareaRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: '64'
+            unique: true
+    oneToMany:
+      messages:
+        targetEntity: IgorGoroun\FTNWBundle\Entity\MessageCache
+        mappedBy: echoarea
+      subscriptions:
+        targetEntity: IgorGoroun\FTNWBundle\Entity\Subscription
+        mappedBy: area
+      pointpackets:
+        targetEntity: IgorGoroun\FTNWBundle\Entity\PointMessage
+        mappedBy: area
+    lifecycleCallbacks: {  }

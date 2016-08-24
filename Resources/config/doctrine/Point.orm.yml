@@ -1,0 +1,68 @@
+IgorGoroun\FTNWBundle\Entity\Point:
+    type: entity
+    table: null
+    repositoryClass: IgorGoroun\FTNWBundle\Repository\PointRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        num:
+            type: integer
+            nullable: false
+            unique: true
+        username:
+            type: string
+            length: '32'
+        email:
+            type: string
+            length: '48'
+            nullable: true
+            unique: true
+        password:
+            type: string
+            length: '64'
+        plainPassword:
+            type: string
+            length: '64'
+        ifaddr:
+            type: string
+            length: '64'
+            unique: true
+        ifname:
+            type: string
+            length: '32'
+        ftnaddr:
+            type: string
+            length: '32'
+        subscription:
+            type: text
+            nullable: true
+        origin:
+            type: string
+            length: '128'
+            nullable: true
+        active:
+            type: boolean
+            nullable: false
+        classic:
+            type: boolean
+            nullable: false
+            options:
+              default: false
+        created:
+            type: datetime
+    oneToMany:
+        subscriptions:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Subscription
+            mappedBy: point
+        echomail:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\PointMessage
+            mappedBy: point
+        netmail:
+            targetEntity: IgorGoroun\FTNWBundle\Entity\Netmail
+            mappedBy: point
+    lifecycleCallbacks:
+        prePersist: [setCreatedValue]
