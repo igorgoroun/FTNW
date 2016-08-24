@@ -1,0 +1,13 @@
+{
+    "name": "igorgoroun/ftnw-bundle",
+    "description": "Web-based point system for fidonet node based on ifmail",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Igor Goroun",
+            "email": "igor.goroun@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}

@@ -6,3 +6,4 @@
 
 # Config file
 Resources/config/parameters.yml
+/vendor/
