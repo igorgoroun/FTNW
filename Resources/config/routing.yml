@@ -15,6 +15,12 @@ fidonews_group:
     requirements:
         group_id: \d+
 
+fidonews_group_list:
+    path: /echo/{group_id}/list
+    defaults: { _controller: FTNWBundle:Editor:echomailList }
+    requirements:
+        group_id: \d+
+
 fidonews_message:
     path: /echo/{group_id}/{message_number}
     defaults: { _controller: FTNWBundle:Editor:message }
@@ -37,6 +43,10 @@ fidonews_reply:
 netmail:
     path: /netmail
     defaults: { _controller: FTNWBundle:Editor:netmailcheck }
+
+netmail_list:
+    path: /netmail/list
+    defaults: { _controller: FTNWBundle:Editor:netmailList }
 
 netmail_message:
     path: /netmail/{id}

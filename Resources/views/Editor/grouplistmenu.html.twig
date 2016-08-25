@@ -5,6 +5,7 @@
     <a href="{{ path("netmail") }}" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span></a>
     <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">{% if group_current is defined %}{{ group_current.name }}{% else %}Echoareas{% endif %} {% if nav is defined %} {{ nav.current }}/{{ nav.total }} {% endif %}
         <span class="caret"></span></a>
+    {% if group_current is defined %}<a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}" class="btn btn-primary"><span class="glyphicon glyphicon-list"></span></a>{% endif %}
     {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}
 </div>
 </p>

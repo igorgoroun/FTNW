@@ -14,11 +14,8 @@
             </div>
             <div class="col-md-9">
                     <div class="page-header hidden-xs">
-                        <div class="btn-group pull-right" role="group" aria-label="...">
-                            {% if nav.prev is defined %}<a href="{{ path('netmail_message',{'id':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-                            <a href="{{ path("netmail_post") }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
-                            {% if message %}<a href="{{ path('netmail_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>{% endif %}
-                            {% if nav.next is defined %}<a href="{{ path('netmail_message',{'id':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+                        <div class="pull-right">
+                        {% include 'FTNWBundle:Editor:netmail-buttons.html.twig' %}
                         </div>
                         <h1 class="bloghead">
                             Netmail
@@ -56,18 +53,13 @@
                     <div class="message_viewer">{{ message.body|raw }}</div>
 
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-5">
                             <p>
-                            <div class="btn-group" role="group" aria-label="...">
-                                {% if nav.prev is defined %}<a href="{{ path('netmail_message',{'id':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-                                <a href="{{ path("netmail_post") }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
-                                <a href="{{ path('netmail_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
-                                {% if nav.next is defined %}<a href="{{ path('netmail_message',{'id':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
-                            </div>
+                            {% include 'FTNWBundle:Editor:netmail-buttons.html.twig' %}
                             </p>
 
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-7">
                             <blockquote class="blockquote-reverse">
                                 {{ message.origin }}
                                 <footer>{{ message.tearline }}</footer>

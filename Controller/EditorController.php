@@ -17,6 +17,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EditorController extends Controller
 {
+    public function netmailListAction(Request $request) {
+
+    }
+    public function echomailListAction($group_id, Request $request) {
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.subject,m.hDate")
+            ->from("FTNWBundle:PointMessage","p")
+            ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
+            ->where("p.point = :point_id")
+            ->andWhere("p.area = :area_id")
+            ->andWhere("p.seen = 0")
+            ->orderBy("m.hDate","asc")
+            ->setParameter("point_id",$this->getUser()->getId())
+            ->setParameter("area_id",$group_id);
+        $pm = $qb->getQuery()->getResult();
+
+        return $this->render("FTNWBundle:Editor:echomail-group-list.html.twig", array(
+            'groups'=> $this->getPointGroups(),
+            'group_current' => $this->getDoctrine()->getRepository("FTNWBundle:Echoarea")->find($group_id),
+            'netmail_unread' => $this->getPointUnreadNetmail(),
+            'messages' => $pm,
+        ));
+    }
     public function netmailReplyAction(Netmail $message,Request $request) {
         if (!$message) {
             $this->addFlash("error","Invalid message ID");

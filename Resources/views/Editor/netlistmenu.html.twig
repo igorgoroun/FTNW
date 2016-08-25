@@ -3,6 +3,7 @@
 <div class="btn-group btn-group-justified visible-sm visible-xs" role="group" aria-label="...">
     {% if nav.prev is defined %}<a href="{{ path('netmail_message',{'id':nav.prev}) }}" type="button" class="btn btn-primary">&larr;</a>{% endif %}
     <a href="{{ path("netmail") }}" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> {% if nav is defined %} {{ nav.current }}/{{ nav.total }} {% endif %}</a>
+    <a href="{{ path("netmail_list") }}" class="btn btn-primary"><span class="glyphicon glyphicon-list"></span></a>
     <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">Echoareas
         <span class="caret"></span></a>
     {% if nav.next is defined %}<a href="{{ path('netmail_message',{'id':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}

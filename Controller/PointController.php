@@ -78,6 +78,7 @@ class PointController extends Controller
                 // last username entered by the user
                 'last_username' => $lastUsername,
                 'error'         => $error,
+                'ftnw_ver' => $this->getParameter('ftnw_ver'),
             )
         );
     }

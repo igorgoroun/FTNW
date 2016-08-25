@@ -14,19 +14,19 @@
             </div>
             <div class="col-md-9">
                 {% if group_current is defined %}
-                    <div class="page-header hidden-xs">
-                        <div class="btn-group pull-right" role="group" aria-label="...">
-                            {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-                            <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
-                            {% if message %}<a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>{% endif %}
-                            {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
-                        </div>
+                    <div class="row hidden-sm hidden-xs">
+                      <div class="col-sm-7">
                         <h1 class="bloghead">
                             {{ group_current.name }}
                             {%  if nav %}
                             <small>{{ nav.current }}/{{ nav.total }}</small>
                             {% endif %}
                         </h1>
+                      </div>
+                      <div class="col-sm-5 text-right">
+                        <br>
+                        {% include 'FTNWBundle:Editor:echomail-buttons.html.twig' %}
+                        </div>
                     </div>
                     {% if message %}
                     <div class="panel panel-default">
@@ -58,18 +58,12 @@
                     <div class="message_viewer">{{ message.body|raw }}</div>
 
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-5">
                             <p>
-                            <div class="btn-group" role="group" aria-label="...">
-                                {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-                                <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
-                                <a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
-                                {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
-                            </div>
+                        {% include 'FTNWBundle:Editor:echomail-buttons.html.twig' %}
                             </p>
-
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-7">
                             <blockquote class="blockquote-reverse">
                                 {{ message.origin }}
                                 <footer>{{ message.pid }} {{ message.tid }}</footer>

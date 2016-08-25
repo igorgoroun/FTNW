@@ -1,0 +1,55 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css?family=PT+Mono&subset=cyrillic-ext" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'FTNWBundle:Editor:grouplistmenu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                {% if group_current is defined %}
+                    <div class="page-header hidden-xs">
+                        <h1 class="bloghead">
+                            {{ group_current.name }} <small>message list</small>
+                        </h1>
+                    </div>
+                    {% if messages %}
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <!--<div class="panel-heading">Panel heading</div>-->
+                        <table class="table table-condensed">
+                            {% for pm in messages %}
+                            <tr class="default">
+                                <td><input type="checkbox" name="unreads[{{ pm.id }}]"></td>
+                                <td>{{ pm.hFrom }} <abbr title="">{{ pm.hFromFtn }}</abbr></td>
+                                <td>{{ pm.subject }}</td>
+                                <td>{{ pm.hDate|date('d M Y H:i') }}</td>
+                                <td><a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':pm.id}) }}" class="btn btn-primary btn-xs">read</a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="jumbotron">
+                        <h1>No unread messages</h1>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="jumbotron">
+                        <h1>Please select echoarea to read</h1>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

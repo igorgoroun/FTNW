@@ -13,7 +13,7 @@
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
                 <div class="page-header">
-                    <h1 class="bloghead">Login</h1>
+                    <h1 class="bloghead">Login <small>{{ ftnw_ver }}</small></h1>
                 </div>
                 <form class="form-horizontal" role="form" action="{{ path('point_login') }}" method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
