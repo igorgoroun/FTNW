@@ -564,7 +564,7 @@ class MessageBatch
      */
     public function setBody($body)
     {
-        $this->body = $body;
+        $this->body = ereg_replace("\r\n?","\n",$body);
 
         return $this;
     }
