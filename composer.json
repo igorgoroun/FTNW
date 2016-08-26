@@ -1,6 +1,7 @@
 {
     "name": "igorgoroun/ftnw-bundle",
     "description": "Web-based point system for fidonet node based on ifmail",
+    "license": "GPL-2.0",
     "type": "library",
     "authors": [
         {
@@ -8,7 +9,7 @@
             "email": "igor.goroun@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "php": "^5.5|^7.0"
     },
