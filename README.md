@@ -28,8 +28,30 @@ cd ftnw
 composer require igorgoroun/ftnw-bundle
 ```
 
+### 3. Настройка web-сервера
+Об этом можно подробно почитать [на сайте Symfony](http://symfony.com/doc/master/setup/web_server_configuration.html).
 
-## Настройка
+
+## Настройка FTNW
+Компонент написан (пока что) так, чтобы использоваться как отдельное приложение, поэтому нужно настроить Symfony для правильной работы.
+
+Все настройки будут делаться в директории <code>app/</code>
+
+### 1. AppKernel.php
+Включаем наш компонент (бандл):
+```
+$bundles = [
+	—— *** ——
+	new IgorGoroun\FTNWBundle\FTNWBundle(),
+];
+```
+
+### 2. config/config.yml
+Добавляем подключение параметров компонента:
+```
+imports:
+	- { resource: '@FTNWBundle/Resources/config/parameters.yml' }
+```
 
 
 
