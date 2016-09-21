@@ -8,19 +8,25 @@
 
 ### 1. Устанавливаем Symfony
 Если у вас установлен Symfony-installer, то:
-    symfony new ftnw
+```
+symfony new ftnw
+```
 Если нет:
-    composer create-project symfony/framework-standard-edition ftnw “3.1.*”
+```
+composer create-project symfony/framework-standard-edition ftnw “3.1.*”
+```
 Инсталлер задаст несколько вопросов - хост DB, dbname, и т.д. - можно или указать сразу, либо сконфигурировать позже.
 Инсталлятор создаст диру ftnw, внутри которой будут файлы фреймворка. 
 
 ### 2. Устанавливаем компонент FTNW
 Заходим в созданную директорию
-    cd ftnw
-
+```
+cd ftnw
+```
 Устанавливаем компонент
-    composer require igorgoroun/ftnw-bundle
-
+```
+composer require igorgoroun/ftnw-bundle
+```
 
 
 ## Настройка
