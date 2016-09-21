@@ -30,26 +30,26 @@
                         <table class="table table-condensed">
                             <tr class="default">
                                 <td class="text-right"><strong>From:</strong></td>
-                                <td class="text-left">{{ message.m_hFrom }} <a class="btn btn-xs btn-default">{{ message.m_hFromFtn }}</a></td>
-                                <td class="text-left">{{ message.m_hDate|date('d M Y H:i O') }}</td>
+                                <td class="text-left">{{ message.hFrom }} <a class="btn btn-xs btn-default">{{ message.hFromFtn }}</a></td>
+                                <td class="text-left">{{ message.hDate|date('d M Y H:i O') }}</td>
                             </tr>
                             <tr class="default">
                                 <td class="text-right"><strong>To:</strong></td>
-                                <td class="text-left">{{ message.m_hTo }} {% if message.m_hToFtn %}<a class="btn btn-xs btn-default">{{ message.m_hToFtn }}</a>{% endif %}</td>
-                                <td class="text-left">{{ message.m_cachedAt|date('d M Y H:i O') }}</td>
+                                <td class="text-left">{{ message.hTo }} {% if message.hToFtn %}<a class="btn btn-xs btn-default">{{ message.hToFtn }}</a>{% endif %}</td>
+                                <td class="text-left">{{ message.cachedAt|date('d M Y H:i O') }}</td>
                             </tr>
                             <tr class="default">
                                 <td class="text-right"><strong>Subject:</strong></td>
-                                <td colspan="2">{{ message.m_subject }}<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a></td>
+                                <td colspan="2">{{ message.subject }}<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a></td>
                             </tr>
                         </table>
                     </div>
 
                     <div class="collapse" id="collapseHeaders">
-                        <pre><code>{{ message.m_srcHeader }}</code></pre>
+                        <pre><code>{{ message.srcHeader }}</code></pre>
                     </div>
 
-                    <div class="message_viewer">{{ message.m_body|raw }}</div>
+                    <div class="message_viewer">{{ message.body|raw }}</div>
 
                     <div class="row">
                         <div class="col-sm-5">
@@ -60,8 +60,8 @@
                         </div>
                         <div class="col-sm-7">
                             <blockquote class="blockquote-reverse">
-                                {{ message.m_origin }}
-                                <footer>{{ message.m_tearline }}</footer>
+                                {{ message.origin }}
+                                <footer>{{ message.tearline }}</footer>
                             </blockquote>
                         </div>
                     </div>

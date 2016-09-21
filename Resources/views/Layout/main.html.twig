@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <title>{% block title %}/snake/fido{% endblock %}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block stylesheets %}
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://_maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
     {% endblock %}
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
-    <link rel="stylesheet" href="{{ asset('style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('bundles/ftnwpub/css/style.css') }}" />
 </head>
 <body>
     {% block header %}
@@ -24,12 +25,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="javascript:void(0);" class="navbar-brand consoleswitch" data-container="nav.navbar" data-toggle="popover" data-placement="right" data-content='<form action="" class="" role="search">
-                <input type="text" class="form-control" id="consoleinput" placeholder="command"></form><small id="consolehint">type <code>help</code> for commands list</small>'>/dev/snake</a>
+                <a href="/" class="navbar-brand">{{ node_address }}@fidonet</a>
             </div>
             <div class="collapse navbar-collapse" id="ipg_nav">
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="{% if app.request.attributes.get('_route') starts with 'fidonews' %}active{% endif %}"><a href="{{ path('fidonews_editor') }}">ftnED</a></li>
+                    <li class="{% if app.request.attributes.get('_route') matches '/^(fidonews.*|netmail.*)/' %}active{% endif %}"><a href="{{ path('fidonews_editor') }}">ftnwed</a></li>
                     {% if is_granted('ROLE_USER') %}
                      <li><a href="{{ path('point_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
                     {% else %}

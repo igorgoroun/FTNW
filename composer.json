@@ -1,7 +1,7 @@
 {
     "name": "igorgoroun/ftnw-bundle",
     "description": "Web-based point system for fidonet node based on ifmail",
-    "type": "library",
+    "type": "project",
     "license": "GPL-2.0",
     "authors": [
         {
@@ -11,7 +11,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": "^5.5|^7.0"
+        "php": "^5.5|^7.0",
+        "symfony/framework-standard-edition": "3.1.*"
     },
     "extra": {
         "branch-alias": {

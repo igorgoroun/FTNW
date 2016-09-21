@@ -37,7 +37,7 @@ IgorGoroun\FTNWBundle\Entity\Netmail:
             column: h_to_ftn
         hToRfc:
             type: string
-            length: '32'
+            length: '64'
             nullable: true
             column: h_to_rfc
         hDate:

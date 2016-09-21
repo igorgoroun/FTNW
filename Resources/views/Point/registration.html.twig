@@ -1,7 +1,5 @@
 {% extends 'FTNWBundle:Layout:main.html.twig' %}
 
-{% form_theme form 'bootstrap_3_layout.html.twig' %}
-
 {% block stylesheets %}
     {{ parent() }}
 {% endblock %}
@@ -10,19 +8,59 @@
     {{ parent() }}
     <div class="container">
         <div class="row">
-            <div class="col-md-offset-1 col-md-4">
-                {{ form_start(form) }}
-
+            <div class="col-sm-offset-1 col-sm-10">
+                <div class="page-header">
+                    <h1 class="bloghead">Получить поинта <small>{{ node_address }}</small></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-7">
+                {{ form_start(form, {'attr': {'class':'form-horizontal'}}) }}
                 {{ form_errors(form) }}
-
-                {{ form_row(form.username) }}
-                {{ form_row(form.plainPassword.first) }}
-                {{ form_row(form.plainPassword.second) }}
-                {{ form_row(form.classic) }}
-
-                {{ form_widget(form.save) }}
-
+                <div class="form-group">
+                    {{ form_label(form.username) }}
+                    <div class="col-sm-7">
+                        {{ form_widget(form.username) }}
+                        {% if (form_errors(form.username)) %}
+                        <div class="alert alert-danger">
+                        {{ form_errors(form.username) }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.plainPassword.first) }}
+                    <div class="col-sm-7">
+                        {{ form_widget(form.plainPassword.first) }}
+                        {{ form_errors(form.plainPassword.first) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.plainPassword.second) }}
+                    <div class="col-sm-7">
+                        {{ form_widget(form.plainPassword.second) }}
+                        {{ form_errors(form.plainPassword.second) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-5 col-sm-7">
+                        <div class="checkbox">
+                            <label for="">
+                                {{ form_widget(form.classic) }} {{ form_label(form.classic) }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-5 col-sm-7">
+                        {{ form_widget(form.save) }}
+                    </div>
+                </div>
                 {{ form_end(form) }}
+            </div>
+            <div class="col-sm-3">
+                <p class="lead visible-xs"><br></p>
             </div>
         </div>
     </div>

@@ -8,17 +8,21 @@
     {{ parent() }}
     <div class="container">
         <div class="row">
-            <div class="col-md-offset-3 col-md-6">
+            <div class="col-md-offset-2 col-md-8">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
                 <div class="page-header">
                     <h1 class="bloghead">Login <small>{{ ftnw_ver }}</small></h1>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-2 col-md-5">
                 <form class="form-horizontal" role="form" action="{{ path('point_login') }}" method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                     <div class="form-group">
-                        <label for="num" class="col-sm-3 control-label">2:466/4.</label>
+                        <label for="num" class="col-sm-3 control-label text-right">2:466/4.</label>
                         <div class="col-sm-6">
                             <input class="form-control" type="text" id="num" name="_num" placeholder="Point number" value="{{ last_username }}" />
                         </div>
@@ -33,17 +37,21 @@
                         <div class="col-sm-offset-3 col-sm-9">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="_remember"> Remember me
+                                    <input type="checkbox" name="_remember"> Запомнить меня
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-6">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            <button type="submit" class="btn btn-primary">Вход</button>
                         </div>
                     </div>
                 </form>
+            </div>
+            <div class="col-md-3">
+                <p class="lead visible-xs"><br></p>
+                <a href="{{ path('point_signin') }}" class="btn btn-link btn-block">Получить поинта</a>
             </div>
         </div>
     </div>

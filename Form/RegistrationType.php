@@ -19,14 +19,18 @@ class RegistrationType extends AbstractType
     {
         $builder
             /*->add('email', EmailType::class)*/
-            ->add('username', TextType::class, ['label'=>'Your full name'])
-            ->add('classic', CheckboxType::class, ['label'=>'Classic point without web-access'])
+            ->add('username', TextType::class, ['label'=>'Имя Фамилия (LAT)','attr'=>['class'=>'form-control'],'label_attr'=>['class'=>'col-xs-12 col-sm-5 control-label']])
+            ->add('classic', CheckboxType::class, ['label'=>'Классический поинт без веб-доступа','required'=>false])
             ->add('plainPassword', RepeatedType::class, array(
+                'options'=>array(
+                    'attr'=>['class'=>'form-control'],
+                    'label_attr'=>['class'=>'col-xs-12 col-sm-5 control-label'],
+                ),
                 'type' => PasswordType::class,
-                'first_options' => array('label' => 'Password'),
-                'second_options' => array('label' => 'Repeat password'),
+                'first_options' => array('label' => 'Пароль'),
+                'second_options' => array('label' => 'Пароль еще раз'),
             ))
-            ->add('save', SubmitType::class);
+            ->add('save', SubmitType::class, ['label'=>'Получить','attr'=>['class'=>'btn btn-md btn-primary']]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

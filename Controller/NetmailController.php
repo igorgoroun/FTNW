@@ -6,7 +6,6 @@ use Doctrine\ORM\NoResultException;
 use IgorGoroun\FTNWBundle\Entity\MessageBatch;
 use IgorGoroun\FTNWBundle\Entity\MessageCache;
 use IgorGoroun\FTNWBundle\Entity\Echoarea;
-use IgorGoroun\FTNWBundle\Entity\Navigation;
 use IgorGoroun\FTNWBundle\Entity\Netmail;
 use IgorGoroun\FTNWBundle\Form\MessagePostType;
 use IgorGoroun\FTNWBundle\Form\MessageReplyType;
@@ -16,40 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class EditorController extends Controller
+class NetmailController extends Controller
 {
     public function netmailListAction(Request $request) {
 
     }
-
-    public function echomailListOpsAction($group_id, Request $request) {
-        if ($request->request->get('type')=='markread' && count($request->request->get('unreads'))>0) {
-            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
-            $qb->update("FTNWBundle:PointMessage","p")->set('p.seen',true)->where('p.id IN (:ids)')
-                ->setParameter('ids',array_keys($request->request->get('unreads')));
-            if ($qb->getQuery()->execute()) {
-                $this->addFlash('notice','Selected messages marked as read');
-            } else {
-                $this->addFlash('error','Cannot mark selected messages as read');
-            }
-
-        } elseif ($request->request->get('type')=='delete' && count($request->request->get('unreads'))>0) {
-            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
-            $qb->delete()->from("FTNWBundle:PointMessage",'p')
-                ->where('p.id IN (:ids)')
-                ->setParameter('ids',array_keys($request->request->get('unreads')));
-            if ($qb->getQuery()->execute()) {
-                $this->addFlash('notice','Selected messages deleted');
-            } else {
-                $this->addFlash('error','Cannot delete selected messages');
-            }
-
-        }
-        return $this->redirectToRoute('fidonews_group_list',['group_id'=>$group_id]);
-    }
     public function echomailListAction($group_id, Request $request) {
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
-        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.subject,m.hDate,p.id as pid")
+        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.subject,m.hDate")
             ->from("FTNWBundle:PointMessage","p")
             ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
             ->where("p.point = :point_id")
@@ -108,7 +81,7 @@ class EditorController extends Controller
                 $em->persist($batch);
                 $em->flush();
                 $this->addFlash("notice", "Netmail sent to ".$batch->getHTo());
-                return $this->redirectToRoute("netmail_message", ['netmail_id' => $batch->getId()]);
+                return $this->redirectToRoute("netmail_message", ['id' => $batch->getId()]);
             }
         }
 
@@ -150,7 +123,7 @@ class EditorController extends Controller
                 $em->persist($batch);
                 $em->flush();
                 $this->addFlash("notice", "Netmail sent to ".$batch->getHTo());
-                return $this->redirectToRoute("netmail_message", ['netmail_id' => $batch->getId()]);
+                return $this->redirectToRoute("netmail_message", ['id' => $batch->getId()]);
             }
         }
 
@@ -196,7 +169,7 @@ class EditorController extends Controller
         // render template
 
         if ($id) {
-            return $this->redirectToRoute('netmail_message', ['netmail_id' => $id]);
+            return $this->redirectToRoute('netmail_message', ['id' => $id]);
         } else {
             return $this->render("FTNWBundle:Editor:netmail.html.twig", array(
                 'groups'=> $this->getPointGroups(),
@@ -207,43 +180,15 @@ class EditorController extends Controller
         }
     }
 
-    public function netmailAction ($netmail_id) {
-        // get message
-        $em = $this->getDoctrine()->getManager();
-        $qb = $em->createQueryBuilder();
-        $qb->select(['m','n.id as next_id','p.id as prev_id'])
-            ->from('FTNWBundle:Netmail','m')
-            ->leftJoin('FTNWBundle:Netmail','n','WITH','n.hDate>m.hDate')
-            ->leftJoin('FTNWBundle:Netmail','p','WITH','p.hDate<m.hDate')
-            ->where('m.id=:nm_id')
-            ->andWhere('m.point=:pnt_id')
-            ->addOrderBy('m.hDate','desc')
-            ->addOrderBy('n.hDate','asc')
-            ->addOrderBy('p.hDate','desc')
-            ->setMaxResults(1)
-            ->setParameter('nm_id',$netmail_id)
-            ->setParameter('pnt_id',$this->getUser()->getId());
-        $netmail = $qb->getQuery()->getScalarResult();
-
-        // check netmail exists for point
-        if (!$netmail) {
+    public function netmailAction (Netmail $netmail) {
+        // check is my netmail
+        if (!$netmail || $netmail->getPoint()->getId() != $this->getUser()->getId()) {
             $this->addFlash('error',"Requested message not found");
             return $this->redirectToRoute("fidonews_editor");
-        } else $netmail = $netmail[0];
-
-//        dump($netmail);
-
+        }
         // create navigation
-        $navigation = new Navigation();
-        $navigation->setNext($netmail['next_id']);
-        $navigation->setPrev($netmail['prev_id']);
-
-        $navigation->setNew($this->generateUrl('netmail_post'));
-        $navigation->setReply($this->generateUrl('netmail_reply',['id'=>$netmail['m_id']]));
-
-
-        $em = $this->getDoctrine()->getManager();
-        $qb = $em->createQueryBuilder();
+        $em = $this->getDoctrine();
+        $qb = $em->getManager()->createQueryBuilder();
         $qb->select("n.id")
             ->from("FTNWBundle:Netmail","n")
             ->where("n.point = :point_id")
@@ -251,29 +196,45 @@ class EditorController extends Controller
             ->setParameter("point_id",$this->getUser()->getId());
         $am = $qb->getQuery()->getArrayResult();
 
-        $navigation->setTotal(count($am));
+        $nav = array();
+        $nav["total"] = count($am);
+        $nav["new"] = $this->generateUrl('netmail_post');
+        $nav["reply"] = $this->generateUrl('netmail_reply',['id'=>$netmail->getId()]);
 
         for($i=0;$i<count($am);$i++) {
-            if ($am[$i]['id'] == $netmail['m_id']) {
-                $navigation->setCurrent($i+1);
+            if ($am[$i]['id'] == $netmail->getId()) {
+                if (array_key_exists($i-1,$am)) {
+                    $nav['prev'] = $am[$i-1]['id'];
+                }
+                if (array_key_exists($i+1,$am)) {
+                    $nav['next'] = $am[$i+1]['id'];
+                }
+                $nav["current"] = $i+1;
             }
         }
 
-//        dump($navigation);
-
         // set message as read
-        $nm = $em->find("FTNWBundle:Netmail",$netmail['m_id'])->setSeen(true);
-        $em->persist($nm);
-        $em->flush();
+        $netmail->setSeen(true);
+        $r = $em->getManager();
+        $r->persist($netmail);
+        $r->flush();
 
         // Colorize quotes in message body
-        $netmail['m_body'] = $this->colorizeQuotes($netmail['m_body']);
+        $mlines = explode("\n",$netmail->getBody());
+        $ml_repl = false;
+        for ($l=0;$l<count($mlines);$l++) {
+            if (preg_match("/([a-zA-ZА-Яа-я\ ]+\>{1,})\ /",$mlines[$l])) {
+                $mlines[$l] = "<span>".$mlines[$l]."</span>";
+                $ml_repl = true;
+            }
+        }
+        if ($ml_repl) $netmail->setBody(implode("\n",$mlines));
 
         // return render
-        return $this->render("FTNWBundle:Editor:netmail.html.twig", array(
+        return $this->render("FTNWBundle:Editor:message.html.twig", array(
             'groups'=> $this->getPointGroups(),
             'message' => $netmail,
-            'nav' => $navigation,
+            'nav' => $nav,
             'netmail_unread' => $this->getPointUnreadNetmail(),
             ''
         ));
@@ -512,8 +473,15 @@ class EditorController extends Controller
         $groups = $this->getPointGroups();
 
         // Colorize quotes in message body
-        $message->setBody($this->colorizeQuotes($message->getBody()));
-
+        $mlines = explode("\n",$message->getBody());
+        $ml_repl = false;
+        for ($l=0;$l<count($mlines);$l++) {
+            if (preg_match("/([a-zA-zА-Яа-я]+\>{1,})\ /",$mlines[$l])) {
+                $mlines[$l] = "<span>".$mlines[$l]."</span>";
+                $ml_repl = true;
+            }
+        }
+        if ($ml_repl) $message->setBody(implode("\n",$mlines));
 
         /*$attachment = false;
         if (preg_match("/begin \d{3} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
@@ -554,19 +522,6 @@ class EditorController extends Controller
         $em = $this->getDoctrine()->getRepository("FTNWBundle:Netmail");
         $cnt = $em->findBy(['point'=>$this->getUser(),'seen'=>0]);
         return count($cnt);
-    }
-
-    private function colorizeQuotes ($body) {
-        $mlines = explode("\n",$body);
-        $ml_repl = false;
-        for ($l=0;$l<count($mlines);$l++) {
-            if (preg_match("/([a-zA-ZА-Яа-я\ ]+\>{1,})\ /",$mlines[$l])) {
-                $mlines[$l] = "<span>".$mlines[$l]."</span>";
-                $ml_repl = true;
-            }
-        }
-        if ($ml_repl) return implode("\n",$mlines);
-        else return $body;
     }
 
     public function makeRFC($name=false,$ftn) {

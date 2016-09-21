@@ -9,6 +9,12 @@ use IgorGoroun\FTNWBundle\Form\RegistrationType;
 
 class PointController extends Controller
 {
+    public function classicAction($num) {
+        return $this->render('FTNWBundle:Point:classic.html.twig',array('num'=>$num));
+    }
+    public function webbsAction($num) {
+        return $this->render('FTNWBundle:Point:confirmweb.html.twig',array('num'=>$num));
+    }
 
     public function registerAction(Request $request)
     {
@@ -26,12 +32,31 @@ class PointController extends Controller
             $user->setIfname($this->genIfName($user->getUsername()));
             $user->setOrigin($this->getParameter('point_default_origin'));
             $user->setSubscription($this->getParameter('point_default_subscription').$user->getUsername().', '.$user->getFtnaddr());
+            $user->setCreated(new \DateTime());
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
-            return $this->redirectToRoute('point_login');
+            $this->addFlash('notice','Ваша учетная запись будет активирована через несколько минут.');
+
+            if ($user->getClassic()) {
+                return $this->redirectToRoute('point_classic_info',['num'=>$user->getNum()]);
+                /*
+                return $this->render('FTNWBundle:Point:classic.html.twig',
+                    array(
+                        'point' => $user,
+                    )
+                );*/
+            } else {
+                return $this->redirectToRoute('point_web_info',['num'=>$user->getNum()]);
+                /*
+                return $this->render('FTNWBundle:Point:confirmweb.html.twig',
+                    array(
+                        'point' => $user,
+                    )
+                );*/
+            }
         }
 
         return $this->render(
@@ -55,7 +80,7 @@ class PointController extends Controller
         return $node.'.'.$point;
     }
     private function genFreeNum() {
-        $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
         $qb->select($qb->expr()->max('p.num'))
             ->from('FTNWBundle:Point','p');
         $max_num = $qb->getQuery()->getSingleScalarResult();

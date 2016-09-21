@@ -1,0 +1,41 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1 class="bloghead">Заявка на получение поинта получена</h1>
+                </div>
+                <p>Учетная запись будет активирована в течение 10 минут с параметрами:</p>
+                <ul>
+                    <li>Fido address: <strong>{{ node_address }}.{{ num }}</strong></li>
+                    <li>Account type: <strong>classic point</strong></li>
+                </ul>
+                <p>Для настройки фидошного софта используйте следующие параметры:</p>
+                <ul>
+                    <li>Node fidonet address: <strong>{{ node_address }}</strong></li>
+                    <li>Binkd host: <strong>{{ node_host }}</strong></li>
+                </ul>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+
+            </div>
+            <div class="col-sm-8">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

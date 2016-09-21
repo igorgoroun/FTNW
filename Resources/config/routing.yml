@@ -21,6 +21,13 @@ fidonews_group_list:
     requirements:
         group_id: \d+
 
+fidonews_list_ops:
+    path: /echo/{group_id}/list/operations
+    defaults: { _controller: FTNWBundle:Editor:echomailListOps }
+    requirements:
+        group_id: \d+
+        methods: POST
+
 fidonews_message:
     path: /echo/{group_id}/{message_number}
     defaults: { _controller: FTNWBundle:Editor:message }
@@ -49,10 +56,10 @@ netmail_list:
     defaults: { _controller: FTNWBundle:Editor:netmailList }
 
 netmail_message:
-    path: /netmail/{id}
+    path: /netmail/{netmail_id}
     defaults: { _controller: FTNWBundle:Editor:netmail }
     requirements:
-        id: \d+
+        netmail_id: \d+
 
 netmail_post:
     path: /netmail/post
@@ -75,6 +82,18 @@ point_login:
 point_logout:
     path: /logout
     defaults: { _controller: FTNWBundle:Point:logout }
+
+point_classic_info:
+    path: /classic/{num}
+    defaults: { _controller: FTNWBundle:Point:classic }
+    requirements:
+        num: \d+
+
+point_web_info:
+    path: /webbs/{num}
+    defaults: { _controller: FTNWBundle:Point:webbs }
+    requirements:
+        num: \d+
 
 rest_uplink_new:
     path: /api/uplink/new

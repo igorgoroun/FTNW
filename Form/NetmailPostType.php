@@ -18,7 +18,7 @@ class NetmailPostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('hTo',TextType::class,['label'=>'To:','attr'=>['class'=>'form-control','placeholder'=>'Recipient Name'],'label_attr'=>['class'=>'col-sm-2 control-label']])
+            ->add('hTo',TextType::class,['label'=>'To:','attr'=>['class'=>'form-control','placeholder'=>'Recipient Name'],'label_attr'=>['class'=>'col-xs-12 col-sm-2 control-label']])
             ->add('hToFtn',TextType::class,['attr'=>['class'=>'form-control','placeholder'=>'z:nnn/ff.pp']])
             ->add('subject',TextType::class,['label'=>'Subject:','attr'=>['placeholder'=>'Subject','class'=>'form-control'],'label_attr'=>['class'=>'col-sm-2 control-label']])
             ->add('body',TextareaType::class,['attr'=>['rows'=>14,'class'=>'form-control textarea ftnweditor']])

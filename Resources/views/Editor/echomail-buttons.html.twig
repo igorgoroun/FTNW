@@ -1,7 +1,19 @@
 <div class="btn-group" role="group" aria-label="...">
     {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-    <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
+    <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-plus"></span> New</a>
     <a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
-    {% if group_current is defined %}<a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}" class="btn btn-primary"><span class="glyphicon glyphicon-list"></span></a>{% endif %}
+    {% if group_current is defined %}
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-cog"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-list"></span> Unseen messages list</a></li>
+                <!--<li role="separator" class="divider"></li>
+                <li><a href="#"><span class="glyphicon glyphicon-forward"></span> Forward message</a></li>
+                -->
+            </ul>
+        </div>
+    {% endif %}
     {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
 </div>

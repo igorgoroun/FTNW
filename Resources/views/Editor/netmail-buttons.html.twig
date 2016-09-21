@@ -1,7 +1,6 @@
 <div class="btn-group" role="group" aria-label="...">
-    {% if nav.prev is defined %}<a href="{{ path('netmail_message',{'id':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
-    <a href="{{ path("netmail_post") }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-envelope"></span> New</a>
-    {% if message %}<a href="{{ path('netmail_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>{% endif %}
-    <a href="{{ path("netmail_list") }}" class="btn btn-primary"><span class="glyphicon glyphicon-list"></span></a>
-    {% if nav.next is defined %}<a href="{{ path('netmail_message',{'id':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+    {% if nav.prev %}<a href="{{ path('netmail_message',{'netmail_id':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
+    <a href="{{ path("netmail_post") }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-plus"></span> New</a>
+    {% if message %}<a href="{{ path('netmail_reply',{'id':message.m_id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>{% endif %}
+    {% if nav.next %}<a href="{{ path('netmail_message',{'netmail_id':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
 </div>

@@ -2,7 +2,6 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="https://fonts.googleapis.com/css?family=PT+Mono&subset=cyrillic-ext" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -14,7 +13,7 @@
             </div>
             <div class="col-md-9">
                 {% if group_current is defined %}
-                    <div class="row hidden-sm hidden-xs">
+                    <div class="row">
                       <div class="col-sm-7">
                         <h1 class="bloghead">
                             {{ group_current.name }}
@@ -23,13 +22,13 @@
                             {% endif %}
                         </h1>
                       </div>
-                      <div class="col-sm-5 text-right">
+                      <div class="col-sm-5 text-right hidden-xs hidden-sm">
                         <br>
                         {% include 'FTNWBundle:Editor:echomail-buttons.html.twig' %}
                         </div>
                     </div>
                     {% if message %}
-                    <div class="panel panel-default">
+                    <div class="panel panel-default" style="margin-bottom:0.5em;">
                         <!-- Default panel contents -->
                         <!--<div class="panel-heading">Panel heading</div>-->
                         <table class="table table-condensed">
@@ -46,9 +45,41 @@
                             </tr>
                             <tr class="default">
                                 <td class="text-right"><strong>Subject:</strong></td>
-                                <td colspan="2">{{ message.subject }}<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a></td>
+                                <td colspan="2">{{ message.subject }}
+                                    <!--<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a>-->
+                                    {% if group_current is defined %}
+                                        <div class="btn-group pull-right" role="group">
+                                            <button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li><a href="{{ path('fidonews_post',{'id':group_current.id}) }}"><span class="glyphicon glyphicon-plus"></span> Write message</a></li>
+                                                <li><a href="{{ path('fidonews_reply',{'id':message.id}) }}"><span class="glyphicon glyphicon-share-alt"></span> Reply to message</a></li>
+                                                <li role="separator" class="divider"></li>
+                                                <li><a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-list"></span> Unseen messages list</a></li>
+                                                <li><a role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders"><span class="glyphicon glyphicon-console"></span>Message headers</a></li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
                             </tr>
                         </table>
+                    </div>
+                    <p>
+                    <div class="btn-group btn-group-justified visible-sm visible-xs" role="group" aria-label="...">
+                        {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary">&larr;</a>{% endif %}
+                        <a href="{{ path("netmail") }}" class="btn btn-primary">Netmail{% if netmail_unread %} <span class="badge">{{ netmail_unread }}</span>{% endif %}</a>
+                        <a class="btn btn-primary active" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">{% if group_current is defined %}{{ group_current.name }}{% else %}Echoareas{% endif %}
+                            <span class="caret"></span></a>
+                        {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}
+                    </div>
+                    </p>
+                    <div class="collapse" id="collapseAreas">
+                        <div class="list-group">
+                            {% for group in groups %}
+                                <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
 
                     <div class="collapse" id="collapseHeaders">

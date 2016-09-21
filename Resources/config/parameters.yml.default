@@ -2,7 +2,11 @@ parameters:
     node_ftn_address: '2:466/4'
     node_if_address: 'f4.n466.z2.fidonet.org'
     node_api_passwd: '####'
+    node_sysop_name: 'Igor Goroun'
     node_tearline: 'Sent with FTNW. https://fido.snake.mk.ua'
-    ftnw_version: 'ftnw-0.1-dev'
     point_default_origin: 'FTNW. https://fido.snake.mk.ua'
     point_default_subscription: 'wbw, '
+
+twig:
+    globals:
+        node_address: '%node_ftn_address%'
