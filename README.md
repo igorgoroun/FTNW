@@ -35,7 +35,7 @@ composer require igorgoroun/ftnw-bundle
 ## Настройка FTNW
 Компонент написан (пока что) так, чтобы использоваться как отдельное приложение, поэтому нужно настроить Symfony для правильной работы.
 
-Все настройки будут делаться в директории <code>app/</code>
+Общие настройки проекта будут делаться в директории <code>app/</code>
 
 ### 1. AppKernel.php
 Включаем наш компонент (бандл):
@@ -52,7 +52,46 @@ $bundles = [
 imports:
 	- { resource: '@FTNWBundle/Resources/config/parameters.yml' }
 ```
+Ищем строку <code>validation:</code> и заменяем ее на:
+```
+validation: { enabled: true, enable_annotations: false }
+```
 
+### 3. config/parameters.yml
+В этом файле можно и нужно поменять дефолтные установки для подключения к БД MySQL.
 
+### 4. config/routing.yml
+Все, что есть в файле - комментим и вставляем:
+```
+fidonews:
+    resource: "@FTNWBundle/Resources/config/routing.yml"
+    prefix:   /
+```
 
-# FTNS
+### 5. config/security.yml
+В конец файла добавляем:
+```
+imports:
+    - { resource: '@FTNWBundle/Resources/config/security.yml' }
+```
+
+### 6. Создаем базу и схему
+Для этого выходим в корень проекта и выполняем две команды:
+```
+bin/console doctrine:database:create
+```
+```
+bin/console doctrine:schema:create
+```
+
+### 7. Настройки проекта
+Все настройки, которые касаются ftnw находятся в одном файле, для удобства можно сделать на него симлинк, чтобы не лазить глубоко по директориям:
+```
+ln -s vendor/igorgoroun/ftnw-bundle/Resources/config/parameters.yml parameters.yml
+```
+Теперь можем отредактировать настройки в файле и переходить к настройке серверной части ноды - FTNS.
+**node_api_passwd - не используется*.
+
+# FTNS 
+Серверная часть ноды, работает (пока) в связке с ifmail/ifunpack/ifpack.
+[Описание и настройка серверной части](https://github.com/igorgoroun/FTNS)

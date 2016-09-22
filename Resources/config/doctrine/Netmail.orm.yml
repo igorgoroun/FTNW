@@ -12,7 +12,7 @@ IgorGoroun\FTNWBundle\Entity\Netmail:
         messageId:
             type: string
             length: '128'
-            unique: true
+            unique: false
             column: message_id
         hFrom:
             type: string

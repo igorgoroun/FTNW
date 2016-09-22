@@ -4,6 +4,8 @@
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~
 
+._*
+
 # Config file
 Resources/config/parameters.yml
 /vendor/

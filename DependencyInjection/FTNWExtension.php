@@ -21,7 +21,7 @@ class FTNWExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $container->setParameter('ftnw_ver','ftnw-0.2.x-dev');
+        $container->setParameter('ftnw_ver','ftnw-0.2.6');
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

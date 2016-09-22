@@ -213,8 +213,8 @@ class EditorController extends Controller
         $qb = $em->createQueryBuilder();
         $qb->select(['m','n.id as next_id','p.id as prev_id'])
             ->from('FTNWBundle:Netmail','m')
-            ->leftJoin('FTNWBundle:Netmail','n','WITH','n.hDate>m.hDate')
-            ->leftJoin('FTNWBundle:Netmail','p','WITH','p.hDate<m.hDate')
+            ->leftJoin('FTNWBundle:Netmail','n','WITH','n.hDate>m.hDate and n.point=:pnt_id')
+            ->leftJoin('FTNWBundle:Netmail','p','WITH','p.hDate<m.hDate and p.point=:pnt_id')
             ->where('m.id=:nm_id')
             ->andWhere('m.point=:pnt_id')
             ->addOrderBy('m.hDate','desc')
