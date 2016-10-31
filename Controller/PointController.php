@@ -2,6 +2,7 @@
 
 namespace IgorGoroun\FTNWBundle\Controller;
 
+use IgorGoroun\FTNWBundle\Entity\reCaptcha;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use IgorGoroun\FTNWBundle\Entity\Point;
@@ -22,7 +23,7 @@ class PointController extends Controller
         $form = $this->createForm(RegistrationType::class,$user);
 
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->reCaptchaValid($request)) {
             $password = $this->get('security.password_encoder')->encodePassword($user,$user->getPlainPassword());
             $user->setPassword($password);
             $user->setActive(false);
@@ -65,6 +66,11 @@ class PointController extends Controller
                 'form' => $form->createView()
             )
         );
+    }
+    private function reCaptchaValid(Request $request) {
+        $cap = $request->request->get('g-recaptcha-response');
+        $re = new reCaptcha($cap,$secret=$this->getParameter('recaptcha_secret_key'),$url=$this->getParameter('recaptcha_verify_host'));
+        return $re->verifyResponse();
     }
     private function genIfName($name) {
         return mb_strtolower(preg_replace('/\ /','_',$name));
