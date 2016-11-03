@@ -58,6 +58,11 @@ h1.bloghead small a { text-decoration: none; color: #777; }
 }
 pre {
         background-color: #333;
+        color: #ddd;
+}
+pre > div.reply {
+  color: yellow;
+  white-space: pre;
 }
 pre > code {
         color: #ccc;
@@ -123,7 +128,7 @@ textarea.ftnweditor {
     border-radius: 4px;
 }
 
-div.message_viewer {
+.message_viewer {
     overflow: auto;
     font-family: 'PT Mono',"Courier New", Courier, monospace, monospace;
     font-size: 1em;
@@ -139,6 +144,6 @@ div.message_viewer {
     border-radius: 4px;
     white-space: pre-wrap;
 }
-div.message_viewer span {
+.message_viewer span {
     color: #66dd66;
 }

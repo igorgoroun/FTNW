@@ -6,15 +6,31 @@ use IgorGoroun\FTNWBundle\Entity\reCaptcha;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use IgorGoroun\FTNWBundle\Entity\Point;
-use IgorGoroun\FTNWBundle\Form\RegistrationType;
+use IgorGoroun\FTNWBundle\Form\SettingsType;
 
 class PointController extends Controller
 {
-    public function classicAction($num) {
-        return $this->render('FTNWBundle:Point:classic.html.twig',array('num'=>$num));
-    }
-    public function webbsAction($num) {
-        return $this->render('FTNWBundle:Point:confirmweb.html.twig',array('num'=>$num));
+
+    public function settingsAction(Request $request){
+        $user = $this->getUser();
+        $form = $this->createForm(SettingsType::class,$user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('notice','Ваши данные сохранены.');
+
+            return $this->redirectToRoute('point_settings');
+        }
+        return $this->render(
+            'FTNWBundle:Point:settings.html.twig',
+            array(
+                'form' => $form->createView(),
+                'point_num' => $user->getNum(),
+            )
+        );
     }
 
     public function registerAction(Request $request)
@@ -116,6 +132,16 @@ class PointController extends Controller
 
     public function logoutAction() {
         return $this->redirectToRoute('point_login');
+    }
+
+    public function classicAction($num) {
+        return $this->render('FTNWBundle:Point:classic.html.twig',array('num'=>$num));
+    }
+    public function webbsAction($num) {
+        return $this->render('FTNWBundle:Point:confirmweb.html.twig',array('num'=>$num));
+    }
+    public function faqAction() {
+        return $this->render('FTNWBundle:Point:faq.html.twig');
     }
 
 }

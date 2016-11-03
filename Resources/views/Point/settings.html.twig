@@ -1,0 +1,71 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10">
+                <div class="page-header">
+                    <h1 class="bloghead">Profile <small>{{ node_address }}.{{ point_num }}</small></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10">
+                {{ form_start(form, {'attr': {'class':'form-horizontal'}}) }}
+                {{ form_errors(form) }}
+                <div class="form-group">
+                    {{ form_label(form.username) }}
+                    <div class="col-sm-4">
+                        {{ form_widget(form.username) }}
+                        {% if (form_errors(form.username)) %}
+                        <div class="alert alert-danger">
+                        {{ form_errors(form.username) }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.origin) }}
+                    <div class="col-sm-8">
+                        {{ form_widget(form.origin) }}
+                        {% if (form_errors(form.origin)) %}
+                            <div class="alert alert-danger">
+                                {{ form_errors(form.origin) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.subscription) }}
+                    <div class="col-sm-8">
+                        {{ form_widget(form.subscription) }}
+                        {% if (form_errors(form.subscription)) %}
+                            <div class="alert alert-danger">
+                                {{ form_errors(form.subscription) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        {{ form_widget(form.save) }}
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+            <div class="col-sm-3">
+                <p class="lead visible-xs"><br></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

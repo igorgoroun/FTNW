@@ -89,6 +89,14 @@ point_classic_info:
     requirements:
         num: \d+
 
+point_settings:
+    path: /settings
+    defaults: { _controller: FTNWBundle:Point:settings }
+
+point_faq:
+    path: /faq
+    defaults: { _controller: FTNWBundle:Point:faq }
+
 point_web_info:
     path: /webbs/{num}
     defaults: { _controller: FTNWBundle:Point:webbs }

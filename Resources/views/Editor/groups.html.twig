@@ -110,11 +110,19 @@
                     {% endif %}
                 {% else %}
                     <div class="page-header">
-                        <h1 class="bloghead">FTNW 2:466/4</h1>
+                        <h1 class="bloghead">{{ node_address }}.{{ point_num }}</h1>
                     </div>
-                    <div class="jumbotron">
-                        <h2>ftnwED 0.1-dev</h2>
-                        <p>Please select echoarea to read</p>
+                    <div class="row">
+                        {% for dash in dashboard %}
+                        <div class="col-sm-4">
+                            <div class="list-group">
+                                <a href="{{ dash.link }}" class="list-group-item">
+                                    <h2 class="list-group-item-heading">{{ dash.cnt }} <small>unread</small></h2>
+                                    <p class="list-group-item-text">{{ dash.desc }}</p>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>

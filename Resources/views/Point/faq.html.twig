@@ -1,0 +1,37 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1 class="bloghead">FAQ</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 text-right">
+                <p><strong>Как подписаться на эхоконференции</strong></p>
+            </div>
+            <div class="col-sm-8">
+                <p>Чтобы подписаться/отписать на эхи, нужно отправить нетмейл на имя <code>AreaFix</code> на адрес <code>{{ node_address }}</code>, в поле Subject указав свой пароль.</p>
+                <p>В теле письма:</p>
+                <du>
+                    <dd><code>%list</code> - чтобы получить список доступных эхоконференций</dd>
+                    <dd><code>%help</code> - чтобы получить помощь по работе с AreaFix</dd>
+                    <dd><code>+название_эхи</code> - подписаться на эхоконференцию</dd>
+                    <dd><code>-название_эхи</code> - отписаться от эхоконференции</dd>
+                </du>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

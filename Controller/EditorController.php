@@ -409,10 +409,28 @@ class EditorController extends Controller
     {
         // Get grouplist
         $groups = $this->getPointGroups();
+        $netmail_unread = $this->getPointUnreadNetmail();
+        $point = $this->getUser()->getNum();
+        $dashboard_list = array();
+        // netmail first
+        $dashboard_list[0]['cnt'] = $netmail_unread;
+        $dashboard_list[0]['desc'] = "Netmail";
+        $dashboard_list[0]['link'] = $this->generateUrl('netmail');
+        // areas
+        for ($i=1;$i<3;$i++) {
+            if (count($groups) > $i-1) {
+                $dashboard_list[$i]['cnt'] = $groups[$i-1]['cnt'];
+                $dashboard_list[$i]['desc'] = $groups[$i-1]['name'];
+                $dashboard_list[$i]['link'] = $this->generateUrl('fidonews_group',array('group_id'=>$groups[$i-1]['id']));
+            }
+        }
+
         // render template
         return $this->render('FTNWBundle:Editor:groups.html.twig', array(
-            'groups'=>$groups,
-            'netmail_unread' => $this->getPointUnreadNetmail(),
+            'point_num' => $point,
+            'groups' => $groups,
+            'netmail_unread' => $netmail_unread,
+            'dashboard' => $dashboard_list,
         ));
     }
 
@@ -510,6 +528,8 @@ class EditorController extends Controller
 
         // groups list
         $groups = $this->getPointGroups();
+
+        $message->setBody(str_replace(['<','>'],['&lt;','&gt;'],$message->getBody()));
 
         // Colorize quotes in message body
         $message->setBody($this->colorizeQuotes($message->getBody()));

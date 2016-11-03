@@ -27,9 +27,12 @@
             </div>
             <div class="collapse navbar-collapse" id="ipg_nav">
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="{% if app.request.attributes.get('_route') matches '/^(fidonews.*|netmail.*)/' %}active{% endif %}"><a href="{{ path('fidonews_editor') }}">ftnwed</a></li>
+                    <li class="{% if app.request.attributes.get('_route') matches '/^(fidonews.*)/' %}active{% endif %}"><a href="{{ path('fidonews_editor') }}">Echomail</a></li>
+                    <li class="{% if app.request.attributes.get('_route') matches '/^(netmail.*)/' %}active{% endif %}"><a href="{{ path('netmail') }}">Netmail</a></li>
+                    <li class="{% if app.request.attributes.get('_route') matches '/^(point_faq)/' %}active{% endif %}"><a href="{{ path('point_faq') }}">FAQ</a></li>
                     {% if is_granted('ROLE_USER') %}
-                     <li><a href="{{ path('point_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                        <li class="{% if app.request.attributes.get('_route') matches '/^(point_settings)/' %}active{% endif %}"><a href="{{ path('point_settings') }}"><span class="glyphicon glyphicon-cog"></span></a></li>
+                        <li><a href="{{ path('point_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
                     {% else %}
                     <li class="{% if app.request.attributes.get('_route') ends with 'login' %}active{% endif %}"><a href="{{ path('point_login') }}"><span class="glyphicon glyphicon-log-in"></span></a></li>
                     {% endif %}
