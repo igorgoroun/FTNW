@@ -62,8 +62,11 @@ netmail_message:
         netmail_id: \d+
 
 netmail_post:
-    path: /netmail/post
-    defaults: { _controller: FTNWBundle:Editor:netmailPost }
+    path: /netmail/post/{nm}/{rfca}
+    defaults: { _controller: FTNWBundle:Editor:netmailPost, nm: null, rfca: null }
+netmail_email:
+    path: /netmail/email
+    defaults: { _controller: FTNWBundle:Editor:netmailPostEmail }
 
 netmail_reply:
     path: /netmail/{id}/reply

@@ -2,6 +2,7 @@
 
 namespace IgorGoroun\FTNWBundle\Controller;
 
+use Doctrine\Common\Cache\ApcuCache;
 use Doctrine\ORM\NoResultException;
 use IgorGoroun\FTNWBundle\Entity\MessageBatch;
 use IgorGoroun\FTNWBundle\Entity\MessageCache;
@@ -11,6 +12,7 @@ use IgorGoroun\FTNWBundle\Entity\Netmail;
 use IgorGoroun\FTNWBundle\Form\MessagePostType;
 use IgorGoroun\FTNWBundle\Form\MessageReplyType;
 use IgorGoroun\FTNWBundle\Form\NetmailPostType;
+use IgorGoroun\FTNWBundle\Form\EmailPostType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,8 +62,12 @@ class EditorController extends Controller
             ->setParameter("area_id",$group_id);
         $pm = $qb->getQuery()->getResult();
 
+        $groups = $this->separatePointGroups();
+
         return $this->render("FTNWBundle:Editor:echomail-group-list.html.twig", array(
-            'groups'=> $this->getPointGroups(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'group_current' => $this->getDoctrine()->getRepository("FTNWBundle:Echoarea")->find($group_id),
             'netmail_unread' => $this->getPointUnreadNetmail(),
             'messages' => $pm,
@@ -112,19 +118,78 @@ class EditorController extends Controller
             }
         }
 
+        $groups = $this->separatePointGroups();
+
         return $this->render('FTNWBundle:Editor:netmail-new.html.twig', array(
             'point' => $point,
             'form' => $form->createView(),
-            'groups' => $this->getPointGroups(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
     }
 
-    public function netmailPostAction(Request $request) {
+    public function netmailPostEmailAction(Request $request) {
+        if ($this->getParameter('internet_gate') == null) {
+            $this->addFlash('notice','This node is not configured to send emails');
+            return $this->redirectToRoute('netmail');
+        }
+        $point = $this->getUser();
+        $batch = new Netmail();
+        $batch->setBody("\n\n\n".$point->getSubscription()."\n");
+
+        $form = $this->createForm(EmailPostType::class,$batch);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            // Add data to batch record
+            $batch->setPoint($point);
+            $batch->setHToFtn($this->getParameter('internet_gate'));
+            $batch->setHFrom($point->getUsername());
+            $batch->setHFromFtn($point->getFtnaddr());
+            $batch->setHFromRfc($this->makeRFC($batch->getHFrom(),$batch->getHFromFtn()));
+            $batch->setOrigin($point->getOrigin());
+            $batch->setHFTNmid(substr(md5(time()),0,8));
+            $batch->setMessageId("<".time()."@".$point->getIfaddr().">");
+            $batch->setHDate(new \DateTime());
+            $batch->setTearline($this->getParameter('node_tearline'));
+            $batch->setPid($this->getParameter('ftnw_ver'));
+
+            // Validate and save data
+            if ($form->isValid() && $batch->getHToFtn()!=null) {
+                $batch->setHToRfc($this->makeRFC($batch->getHTo(),$batch->getHToFtn()));
+                $batch->setSrcHeader($batch->makeRFCHeader());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($batch);
+                $em->flush();
+                $this->addFlash("notice", "Email sent to ".$batch->getHTo());
+                return $this->redirectToRoute("netmail_message", ['netmail_id' => $batch->getId()]);
+            }
+        }
+
+        $groups = $this->separatePointGroups();
+
+        return $this->render('FTNWBundle:Editor:email-new.html.twig', array(
+            'point' => $point,
+            'form' => $form->createView(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
+            'netmail_unread' => $this->getPointUnreadNetmail(),
+        ));
+    }
+    public function netmailPostAction($nm=null,$rfca=null,Request $request) {
         $point = $this->getUser();
 
         $batch = new Netmail();
         $batch->setBody("\n\n\n".$point->getSubscription()."\n");
+        if ($nm != null) {
+            $batch->setHTo($nm);
+        }
+        if ($rfca != null) {
+            $batch->setHToFtn($this->makeFTN($rfca));
+        }
 
         $form = $this->createForm(NetmailPostType::class,$batch);
 
@@ -154,10 +219,14 @@ class EditorController extends Controller
             }
         }
 
+        $groups = $this->separatePointGroups();
+
         return $this->render('FTNWBundle:Editor:netmail-new.html.twig', array(
             'point' => $point,
             'form' => $form->createView(),
-            'groups' => $this->getPointGroups(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
     }
@@ -198,8 +267,11 @@ class EditorController extends Controller
         if ($id) {
             return $this->redirectToRoute('netmail_message', ['netmail_id' => $id]);
         } else {
+            $groups = $this->separatePointGroups();
             return $this->render("FTNWBundle:Editor:netmail.html.twig", array(
-                'groups'=> $this->getPointGroups(),
+                'groups' => $groups['all'],
+                'groups_visible' => $groups['visible'],
+                'groups_more' => $groups['more'],
                 'message' => false,
                 'nav' => false,
                 'netmail_unread' => $this->getPointUnreadNetmail(),
@@ -269,9 +341,13 @@ class EditorController extends Controller
         // Colorize quotes in message body
         $netmail['m_body'] = $this->colorizeQuotes($netmail['m_body']);
 
+        $groups = $this->separatePointGroups();
+
         // return render
         return $this->render("FTNWBundle:Editor:netmail.html.twig", array(
-            'groups'=> $this->getPointGroups(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'message' => $netmail,
             'nav' => $navigation,
             'netmail_unread' => $this->getPointUnreadNetmail(),
@@ -315,12 +391,14 @@ class EditorController extends Controller
             }
         }
 
-        $groups = $this->getPointGroups();
+        $groups = $this->separatePointGroups();
         return $this->render('FTNWBundle:Editor:echomail-new.html.twig', array(
             'point' => $point,
             'form' => $form->createView(),
             'group_current' => $area,
-            'groups' => $groups,
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
     }
@@ -369,13 +447,15 @@ class EditorController extends Controller
                 return $this->redirectToRoute("fidonews_group", ['group_id' => $message->getEchoarea()->getId()]);
             }
         }
-        $groups = $this->getPointGroups();
+        $groups = $this->separatePointGroups();
 
         return $this->render('FTNWBundle:Editor:echomail-reply.html.twig', array(
             'point' => $point,
             'form' => $form->createView(),
             'group_current' => $message->getEchoarea(),
-            'groups' => $groups,
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
     }
@@ -408,7 +488,7 @@ class EditorController extends Controller
     public function groupsAction()
     {
         // Get grouplist
-        $groups = $this->getPointGroups();
+        $groups = $this->separatePointGroups();
         $netmail_unread = $this->getPointUnreadNetmail();
         $point = $this->getUser()->getNum();
         $dashboard_list = array();
@@ -419,16 +499,18 @@ class EditorController extends Controller
         // areas
         for ($i=1;$i<3;$i++) {
             if (count($groups) > $i-1) {
-                $dashboard_list[$i]['cnt'] = $groups[$i-1]['cnt'];
-                $dashboard_list[$i]['desc'] = $groups[$i-1]['name'];
-                $dashboard_list[$i]['link'] = $this->generateUrl('fidonews_group',array('group_id'=>$groups[$i-1]['id']));
+                $dashboard_list[$i]['cnt'] = $groups['visible'][$i-1]['cnt'];
+                $dashboard_list[$i]['desc'] = $groups['visible'][$i-1]['name'];
+                $dashboard_list[$i]['link'] = $this->generateUrl('fidonews_group',array('group_id'=>$groups['visible'][$i-1]['id']));
             }
         }
 
         // render template
         return $this->render('FTNWBundle:Editor:groups.html.twig', array(
             'point_num' => $point,
-            'groups' => $groups,
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
             'netmail_unread' => $netmail_unread,
             'dashboard' => $dashboard_list,
         ));
@@ -474,11 +556,15 @@ class EditorController extends Controller
                 $id = false;
             }
         }
+
         if ($id) {
             return $this->redirectToRoute('fidonews_message', ['group_id' => $group_id, 'message_number' => $id]);
         } else {
+            $groups = $this->separatePointGroups();
             return $this->render("FTNWBundle:Editor:groups.html.twig", array(
-                'groups'=> $this->getPointGroups(),
+                'groups' => $groups['all'],
+                'groups_visible' => $groups['visible'],
+                'groups_more' => $groups['more'],
                 'group_current' => $this->getDoctrine()->getRepository("FTNWBundle:Echoarea")->find($group_id),
                 'message' => false,
                 'nav' => false,
@@ -492,20 +578,10 @@ class EditorController extends Controller
     {
         $em = $this->getDoctrine();
 
+        // get message data
         $message = $em->getRepository("FTNWBundle:MessageCache")->find($message_number);
 
-        $qb = $em->getManager()->createQueryBuilder();
-        $qb->select("m.id")
-            ->from("FTNWBundle:PointMessage","p")
-            ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
-            ->where("p.point = :point_id")
-            ->andWhere("p.area = :area_id")
-            ->orderBy("m.hDate","asc")
-            ->setParameter("point_id",$this->getUser()->getId())
-            ->setParameter("area_id",$group_id);
-        $am = $qb->getQuery()->getArrayResult();
-
-        $nav = array();
+        /*
         $nav["total"] = count($am);
         for($i=0;$i<count($am);$i++) {
             if ($am[$i]['id'] == $message->getId()) {
@@ -518,56 +594,163 @@ class EditorController extends Controller
                 $nav["current"] = $i+1;
             }
         }
+        */
+
+        // check message exists for point
+        if (!$message) {
+            $this->addFlash('error',"Requested message not found");
+            return $this->redirectToRoute("fidonews_editor");
+        }
+
+        // create navigation
+        $navigation = new Navigation();
+
+        // previous message id
+        $nm_qb = $em->getManager()->createQueryBuilder();
+        $nm_qb->select('mc.id')
+            ->from('FTNWBundle:PointMessage','pm')
+            ->leftJoin('FTNWBundle:MessageCache','mc','WITH','mc.id=pm.message')
+            ->where('mc.hDate<:mess_date')
+            ->andWhere('mc.echoarea=:group_id')
+            ->andWhere('pm.point=:point_id')
+            ->orderBy('mc.hDate','DESC')
+            ->setMaxResults(1)
+            ->setParameter('mess_date',$message->getHDate()->format('Y-m-d H:i:s'))
+            ->setParameter('group_id',$group_id)
+            ->setParameter('point_id',$this->getUser()->getId())
+            ->getQuery();
+        try {
+            $prev = $nm_qb->getQuery()->getSingleScalarResult();
+            $navigation->setPrev($prev);
+        } catch (NoResultException $e) {
+            $navigation->setPrev(false);
+        }
+
+        // next message id
+        $pm_qb = $em->getManager()->createQueryBuilder();
+        $pm_qb->select('mc.id')
+            ->from('FTNWBundle:PointMessage','pm')
+            ->leftJoin('FTNWBundle:MessageCache','mc','WITH','mc.id=pm.message')
+            ->where('mc.hDate>:mess_date')
+            ->andWhere('mc.echoarea=:group_id')
+            ->andWhere('pm.point=:point_id')
+            ->orderBy('mc.hDate','ASC')
+            ->setMaxResults(1)
+            ->setParameter('mess_date',$message->getHDate()->format('Y-m-d H:i:s'))
+            ->setParameter('group_id',$group_id)
+            ->setParameter('point_id',$this->getUser()->getId())
+            ->getQuery();
+        try {
+            $next = $pm_qb->getQuery()->getSingleScalarResult();
+            $navigation->setNext($next);
+        } catch (NoResultException $e) {
+            $navigation->setNext(false);
+        }
+
+        // reply/new message links
+        $navigation->setNew($this->generateUrl('fidonews_post',['id'=>$group_id]));
+        $navigation->setReply($this->generateUrl('fidonews_reply',['id'=>$message->getId()]));
 
         // set message as read
-        $pm = $em->getRepository("FTNWBundle:PointMessage")->findOneBy(["point"=>$this->getUser()->getId(),"message"=>$message->getId(),"area"=>$message->getEchoarea()->getId()]);
-        $pm->setSeen(true);
-        $r = $em->getManager();
-        $r->persist($pm);
-        $r->flush();
+        $seen_qb = $em->getManager()->createQueryBuilder();
+        $seen_qb->update('FTNWBundle:PointMessage','pm')
+            ->set('pm.seen',1)
+            ->where('pm.point=:point_id')
+            ->andWhere('pm.message=:mess_id')
+            ->setParameter('point_id',$this->getUser()->getId())
+            ->setParameter('mess_id',$message->getId());
+        if ($seen_qb->getQuery()->execute() == 1) {
+            $this->discountCachedGroup($group_id);
+        }
 
         // groups list
-        $groups = $this->getPointGroups();
+        $groups = $this->separatePointGroups();
 
         $message->setBody(str_replace(['<','>'],['&lt;','&gt;'],$message->getBody()));
 
         // Colorize quotes in message body
         $message->setBody($this->colorizeQuotes($message->getBody()));
 
+        // unseen cnt
+        foreach($groups['all'] as $group) {
+            if ($group['id']==$group_id) {
+                $navigation->setUnseen($group['cnt']);
+            }
+        }
 
         /*$attachment = false;
         if (preg_match("/begin \d{3} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
             $attachment = array('file'=>$data[1],'content'=>convert_uudecode($data[2]));
-        }*/
+        }
         if (preg_match("/begin \d{3} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
             $message->setBody(str_replace($data[2],"\n-UUE/cutted-\n",$message->getBody()));
         }
+        */
 
         // return render
         return $this->render("FTNWBundle:Editor:groups.html.twig", array(
-            'groups'=> $groups,
-            'group_current' => $message->getEchoarea(),
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
+            'group_current' => $em->getRepository("FTNWBundle:Echoarea")->find($group_id),
             'message' => $message,
-            'nav' => $nav,
+            'nav' => $navigation,
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
     }
 
     private function getPointGroups() {
         $point_id = $this->getUser()->getId();
-
-        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
-        $qb->select(["e.name","e.id","COUNT(m.id) as cnt"])
-            ->from("FTNWBundle:Subscription",'s')
-            ->leftJoin("FTNWBundle:Echoarea",'e','WITH','e.id=s.area')
-            ->leftJoin("FTNWBundle:PointMessage","m",'WITH',"m.area=s.area and m.point=:point_id and m.seen=0")
-            ->where("s.point = :point_id")
-            ->groupBy("e.name")
-            ->addOrderBy("cnt","DESC")
-            ->addOrderBy('e.name','ASC')
-            ->setParameter("point_id",$point_id);
-        $grouplist = $qb->getQuery()->getResult();
+        $cache = new ApcuCache();
+        $areacache = $cache->fetch($this->getUser()->getId().'.areas');
+        if (!$areacache) {
+            $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+            $qb->select(["e.name","e.id","COUNT(m.id) as cnt"])
+                ->from("FTNWBundle:Subscription",'s')
+                ->leftJoin("FTNWBundle:Echoarea",'e','WITH','e.id=s.area')
+                ->leftJoin("FTNWBundle:PointMessage","m",'WITH',"m.area=s.area and m.point=:point_id and m.seen=0")
+                ->where("s.point = :point_id")
+                ->groupBy("e.name")
+                ->addOrderBy("cnt","DESC")
+                ->addOrderBy('e.name','ASC')
+                ->setParameter("point_id",$point_id);
+            $grouplist = $qb->getQuery()->getResult();
+            $cache->save($this->getUser()->getId().'.areas',$grouplist,600);
+        } else {
+            $grouplist = $areacache;
+        }
         return $grouplist;
+    }
+
+    private function discountCachedGroup($group_id) {
+        $cache = new ApcuCache();
+        if ($areacache = $cache->fetch($this->getUser()->getId().'.areas')) {
+            array_walk($areacache,function(&$item,$idx,$group_id){
+                if ($item['id']==$group_id && $item['cnt']>0) {
+                    $item['cnt']--;
+                }
+            },$group_id);
+            $cache->save($this->getUser()->getId().'.areas',$areacache,600);
+        }
+    }
+
+    private function separatePointGroups() {
+        $grouplist = $this->getPointGroups();
+        $groups = ['visible'=>[],'more'=>null];
+        if (count($grouplist) > $this->getParameter('group_list_visible')) {
+            $groups['more'] = [];
+            for ($i=0;$i<count($grouplist);$i++) {
+                if ($i < $this->getParameter('group_list_visible')) {
+                    $groups['visible'][] = $grouplist[$i];
+                } else {
+                    $groups['more'][] = $grouplist[$i];
+                }
+            }
+        } else {
+            $groups['visible'] = $grouplist;
+        }
+        $groups['all'] = $grouplist;
+        return $groups;
     }
 
     private function getPointUnreadNetmail() {
@@ -611,7 +794,7 @@ class EditorController extends Controller
         if (preg_match("/^p(\d{1,4})\.f(\d{1,4})\.n(\d{1,4})\.z(\d{1})\.(.+)/",$ad,$data)) {
             return $data[4].":".$data[3]."/".$data[2].".".$data[1];
         } elseif (preg_match("/^f(\d{1,4})\.n(\d{1,4})\.z(\d{1})\.(.+)/",$ad,$data)) {
-            return $data[4].":".$data[3]."/".$data[2];
+            return $data[3].":".$data[2]."/".$data[1];
         } else {
             return false;
         }

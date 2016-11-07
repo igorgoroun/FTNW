@@ -5,8 +5,10 @@ parameters:
     node_binkd_host: 'fido.snake.mk.ua'
     node_api_passwd: '####'
     node_tearline: 'Sent with FTNW. https://fido.snake.mk.ua'
+    internet_gate: '2:46/128'
     point_default_origin: 'FTNW. https://fido.snake.mk.ua'
     point_default_subscription: 'wbw, '
+    group_list_visible: 10
     recaptcha_site_key: ''
     recaptcha_secret_key: ''
     recaptcha_verify_host: 'https://www.google.com/recaptcha/api/siteverify'
@@ -15,3 +17,4 @@ twig:
     globals:
         node_address: '%node_ftn_address%'
         node_host: '%node_binkd_host%'
+        recaptcha_site_key: '%recaptcha_site_key%'

@@ -2,6 +2,9 @@ IgorGoroun\FTNWBundle\Entity\MessageCache:
     type: entity
     table: null
     repositoryClass: IgorGoroun\FTNWBundle\Repository\MessageCacheRepository
+    indexes:
+        em_hdate_idx:
+            columns: [h_date]
     id:
         id:
             type: integer
@@ -37,7 +40,7 @@ IgorGoroun\FTNWBundle\Entity\MessageCache:
             column: h_to_ftn
         hToRfc:
             type: string
-            length: '32'
+            length: '64'
             nullable: true
             column: h_to_rfc
         hDate:

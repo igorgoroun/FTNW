@@ -1,5 +1,5 @@
 <div class="btn-group" role="group" aria-label="...">
-    {% if nav.prev is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
+    {% if nav.prev %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
     <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-plus"></span> New</a>
     <a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
     {% if group_current is defined %}
@@ -15,5 +15,5 @@
             </ul>
         </div>
     {% endif %}
-    {% if nav.next is defined %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+    {% if nav.next %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
 </div>

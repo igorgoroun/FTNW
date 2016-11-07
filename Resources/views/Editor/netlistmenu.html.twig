@@ -17,9 +17,4 @@
     </div>
 </div>
 
-<div class="list-group hidden-xs hidden-sm">
-    <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}NETMAIL</a>
-    {% for group in groups %}
-        <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
-    {% endfor %}
-</div>
+{% include 'FTNWBundle:Editor:grouplistmenu.html.twig' %}

@@ -1,7 +1,24 @@
-
-<div class="list-group hidden-xs hidden-sm">
-    <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}NETMAIL</a>
-    {% for group in groups %}
-        <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
-    {% endfor %}
+<div class="panel-group hidden-xs hidden-sm" role="tablist">
+    <div class="panel panel-default">
+        <div class="list-group">
+            <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}NETMAIL</a>
+            {% for group in groups_visible %}
+                <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
+            {% endfor %}
+        </div>
+        {% if groups_more is defined %}
+        <div class="panel-collapse collapse" role="tabpanel" id="echoFullList" aria-labelledby="collapseListGroupHeading1" aria-expanded="true" style="">
+            <div class="list-group">
+                {% for group in groups_more %}
+                    <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel-heading" role="tab" id="collapseListGroupHeading1">
+            <h4 class="panel-title">
+                <a href="#echoFullList" class="" id="echoListMoreButton" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="echoFullList">Еще <span class="glyphicon glyphicon-chevron-down"></span></a>
+            </h4>
+        </div>
+        {% endif %}
+    </div>
 </div>

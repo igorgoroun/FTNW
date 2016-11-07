@@ -17,6 +17,23 @@ class Navigation
     private $prev = null;
     private $new = null;
     private $reply = null;
+    private $unseen = 0;
+
+    /**
+     * @return int
+     */
+    public function getUnseen()
+    {
+        return $this->unseen;
+    }
+
+    /**
+     * @param int $unseen
+     */
+    public function setUnseen($unseen)
+    {
+        $this->unseen = $unseen;
+    }
 
     private $list_unseen = null;
     private $list_all = null;

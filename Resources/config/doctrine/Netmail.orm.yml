@@ -2,6 +2,9 @@ IgorGoroun\FTNWBundle\Entity\Netmail:
     type: entity
     table: null
     repositoryClass: IgorGoroun\FTNWBundle\Repository\NetmailRepository
+    indexes:
+        nm_hdate_idx:
+            columns: [h_date]
     id:
         id:
             type: integer
@@ -28,7 +31,7 @@ IgorGoroun\FTNWBundle\Entity\Netmail:
             column: h_from_ftn
         hTo:
             type: string
-            length: '32'
+            length: '64'
             column: h_to
         hToFtn:
             type: string

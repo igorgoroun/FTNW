@@ -2,6 +2,7 @@
 
 namespace IgorGoroun\FTNWBundle\Controller;
 
+use Doctrine\Common\Cache\ApcuCache;
 use IgorGoroun\FTNWBundle\Entity\reCaptcha;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
