@@ -1,19 +1,21 @@
 <div class="btn-group" role="group" aria-label="...">
-    {% if nav.prev %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md">&larr;</a>{% endif %}
+    {% if nav.prev %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-arrow-left"></span></a>{% endif %}
     <a href="{{ path('fidonews_post',{'id':group_current.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-plus"></span> New</a>
     <a href="{{ path('fidonews_reply',{'id':message.id}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
     {% if group_current is defined %}
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="glyphicon glyphicon-cog"></span>
+                <span class="caret"></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right">
-                <li><a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-list"></span> Unseen messages list</a></li>
-                <!--<li role="separator" class="divider"></li>
+
                 <li><a href="#"><span class="glyphicon glyphicon-forward"></span> Forward message</a></li>
-                -->
+                <li role="separator" class="divider"></li>
+                <li><a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-th-list"></span> Unseen messages list</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-list"></span> All messages list</a></li>
             </ul>
         </div>
     {% endif %}
-    {% if nav.next %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md">&rarr;</a>{% endif %}
+    {% if pm is defined %}<button data-group="{{ group_current.id }}" data-message="{{ message.id }}" data-remote="{{ path('fidonews_message_bookmark') }}" type="button" class="btn btn-primary btn-md echomail-bookmark"><span class="glyphicon {% if pm.bookmarked %}glyphicon-star{% else %}glyphicon-star-empty{% endif %}"></span></button>{% endif %}
+    {% if nav.next %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary btn-md"><span class="glyphicon glyphicon-arrow-right"></span></a>{% endif %}
 </div>

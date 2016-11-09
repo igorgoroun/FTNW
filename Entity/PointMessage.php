@@ -23,6 +23,11 @@ class PointMessage
     private $seen;
 
     /**
+     * @var boolean
+     */
+    private $bookmarked;
+
+    /**
      * @var \IgorGoroun\FTNWBundle\Entity\Point
      */
     private $point;
@@ -32,6 +37,21 @@ class PointMessage
      */
     private $area;
 
+    /**
+     * @return boolean
+     */
+    public function getBookmarked()
+    {
+        return $this->bookmarked;
+    }
+
+    /**
+     * @param boolean $bookmarked
+     */
+    public function setBookmarked($bookmarked)
+    {
+        $this->bookmarked = $bookmarked;
+    }
 
     /**
      * Get id

@@ -1,0 +1,33 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="page-header">
+                    <h1 class="bloghead">Echoareas <small>available on {{ node_address }}</small></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% for area in groups %}
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="panel panel-default">
+                    <div class="list-group">
+                        <a href="{{ path('reader_message_list',{'area':area.id}) }}" class="list-group-item"><span class="badge" style="background-color: transparent;color:#888;">{% if area.lastdate is null %} never got {% else %} {{ area.lastdate|date('j M Y') }} {% endif %}</span><span class="badge">{{ area.cnt }}</span>{{ area.name|upper }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

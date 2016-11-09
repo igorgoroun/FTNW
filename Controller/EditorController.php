@@ -14,6 +14,7 @@ use IgorGoroun\FTNWBundle\Form\MessageReplyType;
 use IgorGoroun\FTNWBundle\Form\NetmailPostType;
 use IgorGoroun\FTNWBundle\Form\EmailPostType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +23,28 @@ class EditorController extends Controller
 {
     public function netmailListAction(Request $request) {
 
+    }
+
+    public function bookmarkEchomailAction(Request $request) {
+        $em = $this->getDoctrine();
+        $result = ['switched'=>false];
+        if (!$message = $em->getRepository('FTNWBundle:PointMessage')->findOneBy(['area'=>$request->request->get('group_id'),'message'=>$request->request->get('message_number'),'point'=>$this->getUser()->getId()])) {
+            return new JsonResponse($result);
+        }
+        if ($message->getBookmarked()) {
+            $message->setBookmarked(false);
+            $result['state'] = false;
+        } else {
+            $message->setBookmarked(true);
+            $result['state'] = true;
+        }
+        $ent = $em->getManager();
+        $ent->persist($message);
+        $ent->flush();
+
+        $result['switched'] = true;
+
+        return new JsonResponse($result);
     }
 
     public function echomailListOpsAction($group_id, Request $request) {
@@ -47,7 +70,9 @@ class EditorController extends Controller
             }
 
         }
-        return $this->redirectToRoute('fidonews_group_list',['group_id'=>$group_id]);
+        $cache = new ApcuCache();
+        $cache->delete($this->getUser()->getId().'.areas');
+        return $this->redirectToRoute('fidonews_group',['group_id'=>$group_id]);
     }
     public function echomailListAction($group_id, Request $request) {
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
@@ -474,7 +499,7 @@ class EditorController extends Controller
         foreach ($barr as $bline) {
             if ($bline!="") {
                 if (preg_match("/([a-zA-Z\ ]+\>{1,})\ (.+)/",$bline,$quoted)) {
-                    $replied []= $quoted[1]."> ".$quoted[2];
+                    $replied []= " ".trim($quoted[1])."> ".$quoted[2];
                 } else {
                     $replied []= $new_quote.trim($bline);
                 }
@@ -578,8 +603,16 @@ class EditorController extends Controller
     {
         $em = $this->getDoctrine();
 
+        // check message is read/unread and bookmarked or not
+        $pm = $em->getManager()->getRepository('FTNWBundle:PointMessage')
+            ->findOneBy(['message'=>$message_number,'area'=>$group_id,'point'=>$this->getUser()->getId()]);
+        if (!$pm) {
+            $this->addFlash('error',"Requested message not found");
+            return $this->redirectToRoute("fidonews_editor");
+        }
+
         // get message data
-        $message = $em->getRepository("FTNWBundle:MessageCache")->find($message_number);
+        $message = $pm->getMessage();
 
         /*
         $nav["total"] = count($am);
@@ -652,14 +685,11 @@ class EditorController extends Controller
         $navigation->setReply($this->generateUrl('fidonews_reply',['id'=>$message->getId()]));
 
         // set message as read
-        $seen_qb = $em->getManager()->createQueryBuilder();
-        $seen_qb->update('FTNWBundle:PointMessage','pm')
-            ->set('pm.seen',1)
-            ->where('pm.point=:point_id')
-            ->andWhere('pm.message=:mess_id')
-            ->setParameter('point_id',$this->getUser()->getId())
-            ->setParameter('mess_id',$message->getId());
-        if ($seen_qb->getQuery()->execute() == 1) {
+        if (!$pm->getSeen()) {
+            $pm->setSeen(true);
+            $ent = $em->getManager();
+            $ent->persist($pm);
+            $ent->flush();
             $this->discountCachedGroup($group_id);
         }
 
@@ -694,9 +724,46 @@ class EditorController extends Controller
             'groups_more' => $groups['more'],
             'group_current' => $em->getRepository("FTNWBundle:Echoarea")->find($group_id),
             'message' => $message,
+            'pm' => $pm,
             'nav' => $navigation,
             'netmail_unread' => $this->getPointUnreadNetmail(),
         ));
+    }
+
+    public function bookmarksListAction() {
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.hToFtn,m.subject,m.hDate,p.id as pid,e.name as areaname,e.id as aid")
+            ->from("FTNWBundle:PointMessage","p")
+            ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
+            ->leftJoin("FTNWBundle:Echoarea","e",'WITH',"e.id=p.area")
+            ->where("p.point = :point_id")
+            ->andWhere("p.bookmarked = 1")
+            ->orderBy("m.hDate","desc")
+            ->setParameter("point_id",$this->getUser()->getId());
+        $pm = $qb->getQuery()->getResult();
+
+        $groups = $this->separatePointGroups();
+
+        return $this->render("FTNWBundle:Editor:bookmarks-list.html.twig", array(
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
+            'netmail_unread' => $this->getPointUnreadNetmail(),
+            'messages' => $pm,
+        ));
+    }
+    public function bookmarksOpsAction(Request $request) {
+        if ($request->request->get('type')=='markread' && count($request->request->get('unreads'))>0) {
+            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
+            $qb->update("FTNWBundle:PointMessage","p")->set('p.bookmarked',0)->where('p.id IN (:ids)')
+                ->setParameter('ids',array_keys($request->request->get('unreads')));
+            if ($qb->getQuery()->execute()) {
+                $this->addFlash('notice','Selected messages removed from bookmarks');
+            } else {
+                $this->addFlash('error','Cannot remove selected messages from bookmarks');
+            }
+        }
+        return $this->redirectToRoute('bookmarks_list');
     }
 
     private function getPointGroups() {

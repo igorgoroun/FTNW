@@ -1,7 +1,11 @@
 <div class="panel-group hidden-xs hidden-sm" role="tablist">
     <div class="panel panel-default">
         <div class="list-group">
-            <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}NETMAIL</a>
+            <a href="{{ path("netmail") }}" class="list-group-item">{% if netmail_unread is defined %}<span class="badge">{{ netmail_unread }}</span>{% endif %}<span class="glyphicon glyphicon-envelope"></span> NETMAIL</a>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="list-group">
             {% for group in groups_visible %}
                 <a href="{{ path('fidonews_group',{'group_id':group.id}) }}" class="list-group-item"><span class="badge">{{ group.cnt }}</span>{{ group.name }}</a>
             {% endfor %}

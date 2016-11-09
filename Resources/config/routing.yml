@@ -35,6 +35,15 @@ fidonews_message:
         group_id: \d+
         message_number: \d+
 
+fidonews_message_bookmark:
+    path: /echo/bookmark
+    defaults: { _controller: FTNWBundle:Editor:bookmarkEchomail }
+    condition: request.isXMLHttpRequest()
+    requirements:
+        group_id: \d+
+        message_number: \d+
+        methods: POST
+
 fidonews_post:
     path: /echo/{id}/post
     defaults: { _controller: FTNWBundle:Editor:post }
@@ -46,6 +55,16 @@ fidonews_reply:
     defaults: { _controller: FTNWBundle:Editor:reply }
     requirements:
         id: \d+
+
+bookmarks_list:
+    path: /bookmarks
+    defaults: { _controller: FTNWBundle:Editor:bookmarksList }
+
+bookmarks_operations:
+    path: /bookmarks/operations
+    defaults: { _controller: FTNWBundle:Editor:bookmarksOps }
+    requirements:
+        methods: POST
 
 netmail:
     path: /netmail
@@ -105,6 +124,17 @@ point_web_info:
     defaults: { _controller: FTNWBundle:Point:webbs }
     requirements:
         num: \d+
+
+reader_areas_list:
+    path: /reader
+    defaults: { _controller: FTNWBundle:Reader:areasList }
+
+reader_message_list:
+    path: /reader/{area}/{page}
+    defaults: { _controller: FTNWBundle:Reader:messageList, page: 1 }
+    requirements:
+        page: \d+
+        area: \d+
 
 rest_uplink_new:
     path: /api/uplink/new

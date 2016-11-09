@@ -13,6 +13,8 @@ IgorGoroun\FTNWBundle\Entity\PointMessage:
             type: datetime
         seen:
             type: boolean
+        bookmarked:
+            type: boolean
     manyToOne:
         point:
             targetEntity: IgorGoroun\FTNWBundle\Entity\Point

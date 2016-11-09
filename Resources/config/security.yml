@@ -19,6 +19,7 @@ security:
         - { path: /echo, roles: ROLE_USER }
         - { path: /netmail, roles: ROLE_USER }
         - { path: /settings, roles: ROLE_USER }
+        - { path: /bookmarks, roles: ROLE_USER }
 
     firewalls:
         dev:

@@ -1,0 +1,76 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'FTNWBundle:Editor:grouplistmenu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                    <div class="page-header hidden-xs">
+                        <h1 class="bloghead">
+                            Bookmarks <small>message list</small>
+                        </h1>
+                    </div>
+                    {% if messages %}
+                    <div class="panel panel-default">
+                        <form action="{{ path("bookmarks_operations") }}" method="post">
+                        <table class="table table-condensed">
+                            <thead>
+                            <tr class="active">
+                                <th><input type="checkbox" id="msgselector"></th>
+                                <th colspan="5">
+                                    <button type="submit" name="type" value="markread" id="msg_markread" class="btn btn-primary btn-xs">Remove bookmark</button>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for pm in messages %}
+                            <tr class="default message-list">
+                                <td><input type="checkbox" class="msg_check" name="unreads[{{ pm.pid }}]"></td>
+                                <td class="text-right"><strong>From:</strong></td>
+                                <td>{{ pm.hFrom }} <abbr title="{{ pm.hFrom }}">{{ pm.hFromFtn }}</abbr></td>
+                                <td class="text-right"><strong>To:</strong></td>
+                                <td>{{ pm.hTo }} <abbr title="{{ pm.hTo }}">{{ pm.hToFtn }}</abbr></td>
+                                <td class="">{{ pm.hDate|date('d M Y H:i') }}</td>
+                            </tr>
+                            <tr class="default message-list-hint">
+                                <td></td>
+                                <td class="text-right"><strong>Area:</strong></td>
+                                <td><a href="{{ path('fidonews_group',{'group_id':pm.aid}) }}">{{ pm.areaname }}</a></td>
+                                <td class="text-right"><strong>Subj:</strong></td>
+                                <td colspan="2"><a href="{{ path('fidonews_message',{'group_id':pm.aid,'message_number':pm.id}) }}">{{ pm.subject }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="jumbotron">
+                        <h1>No bookmarked messages</h1>
+                    </div>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+    $(function(){
+        $('#msgselector').change(function(){
+            if (this.checked) {
+                $(".msg_check").prop('checked',true);
+            } else {
+                $(".msg_check").prop('checked',false);
+            }
+        });
+    });
+    </script>
+{% endblock %}

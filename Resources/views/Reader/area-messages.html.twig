@@ -1,0 +1,56 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="page-header">
+                    <h1 class="bloghead">{{ area.name }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-offset-1 col-lg-10 col-sm-12">
+                {% for message in messages %}
+                <div class="panel panel-default" style="margin-bottom:0.3em;margin-top:1.5em;">
+                    <table class="table table-condensed">
+                        <tr class="default">
+                            <td class="text-right"><strong>From:</strong></td>
+                            <td class="text-left">{{ message.hFrom }} <abbr title="">{{ message.hFromFtn }}</abbr></td>
+                            <td class="text-left">{{ message.hDate|date('d M Y H:i O') }}</td>
+                        </tr>
+                        <tr class="default">
+                            <td class="text-right"><strong>To:</strong></td>
+                            <td class="text-left">{{ message.hTo }} {% if message.hToFtn %}<abbr title="">{{ message.hToFtn }}</abbr>{% endif %}</td>
+                            <td class="text-left">
+                            </td>
+                        </tr>
+                        <tr class="default">
+                            <td class="text-right"><strong>Subject:</strong></td>
+                            <td colspan="2">{{ message.subject }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="message_viewer">{{ message.body|raw }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <nav><ul class="pager">
+                {% for bp in pager %}
+                    <li class="{{ bp.state }}"><a href="{{ path('reader_message_list',{'area':area.id,'page':bp.link}) }}">{{ bp.alt|raw }}</a></li>
+                {% endfor %}
+            </ul></nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

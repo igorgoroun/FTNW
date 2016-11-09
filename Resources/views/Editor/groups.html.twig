@@ -50,7 +50,7 @@
                                     {% if group_current is defined %}
                                         <div class="btn-group pull-right" role="group">
                                             <button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="glyphicon glyphicon-cog"></span>
+                                                <span class="glyphicon glyphicon-menu-hamburger"></span>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right">
                                                 <li><a href="{{ path('fidonews_post',{'id':group_current.id}) }}"><span class="glyphicon glyphicon-plus"></span> Write message</a></li>
@@ -67,11 +67,10 @@
                     </div>
                     <p>
                     <div class="btn-group btn-group-justified visible-sm visible-xs" role="group" aria-label="...">
-                        {% if nav.prev %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary">&larr;</a>{% endif %}
-                        <a href="{{ path("netmail") }}" class="btn btn-primary">Netmail{% if netmail_unread %} <span class="badge">{{ netmail_unread }}</span>{% endif %}</a>
+                        {% if nav.prev %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span></a>{% endif %}
                         <a class="btn btn-primary active" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">{% if group_current is defined %}{{ group_current.name }}{% else %}Echoareas{% endif %}
                             <span class="caret"></span></a>
-                        {% if nav.next %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}
+                        {% if nav.next %}<a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-right"></span></a>{% endif %}
                     </div>
                     </p>
                     <div class="collapse" id="collapseAreas">
@@ -134,6 +133,26 @@
     {{ parent() }}
     <script>
         $(function(){
+            $(".echomail-bookmark").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: $(this).data('remote'),
+                    data: {'group_id':$(this).data('group'),'message_number':$(this).data('message')}
+                }).done(function(res){
+                    if (res.switched) {
+                        console.log("New state: "+res.state);
+                        sp = $(".echomail-bookmark").children("span");
+                        if (res.state) {
+                            sp.removeClass('glyphicon glyphicon-star-empty');
+                            sp.addClass('glyphicon glyphicon-star');
+                        } else {
+                            sp.removeClass('glyphicon glyphicon-star');
+                            sp.addClass('glyphicon glyphicon-star-empty');
+                        }
+                    }
+
+                });
+            });
 
             //$("div.message_viewer").text(parseText($("div.message_viewer").text()));
             //console.log($("#message_body>code").text());

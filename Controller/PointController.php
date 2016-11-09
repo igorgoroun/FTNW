@@ -4,6 +4,7 @@ namespace IgorGoroun\FTNWBundle\Controller;
 
 use Doctrine\Common\Cache\ApcuCache;
 use IgorGoroun\FTNWBundle\Entity\reCaptcha;
+use IgorGoroun\FTNWBundle\Form\RegistrationType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use IgorGoroun\FTNWBundle\Entity\Point;

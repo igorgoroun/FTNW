@@ -1,12 +1,12 @@
 
 <p>
 <div class="btn-group btn-group-justified visible-sm visible-xs" role="group" aria-label="...">
-    {% if nav is defined and nav.prev %}<a href="{{ path('netmail_message',{'netmail_id':nav.prev}) }}" type="button" class="btn btn-primary">&larr;</a>{% endif %}
+    {% if nav is defined and nav.prev %}<a href="{{ path('netmail_message',{'netmail_id':nav.prev}) }}" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span></a>{% endif %}
     <a href="{{ path("netmail") }}" class="btn btn-primary active">Netmail{% if nav is defined %}<span style="letter-spacing: 0.1em;"> {{ nav.current }}/{{ nav.total }} </span>{% endif %}</a>
     <a href="{{ path("netmail_list") }}" class="btn btn-primary"><span class="glyphicon glyphicon-list"></span></a>
     <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseAreas" aria-expanded="false" aria-controls="collapseAreas">Echoareas
         <span class="caret"></span></a>
-    {% if nav is defined and nav.next %}<a href="{{ path('netmail_message',{'netmail_id':nav.next}) }}" type="button" class="btn btn-primary">&rarr;</a>{% endif %}
+    {% if nav is defined and nav.next %}<a href="{{ path('netmail_message',{'netmail_id':nav.next}) }}" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-right"></span></a>{% endif %}
 </div>
 </p>
 <div class="collapse" id="collapseAreas">
