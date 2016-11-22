@@ -16,10 +16,18 @@ fidonews_group:
         group_id: \d+
 
 fidonews_group_list:
-    path: /echo/{group_id}/list
-    defaults: { _controller: FTNWBundle:Editor:echomailList }
+    path: /echo/{group_id}/list/{page}
+    defaults: { _controller: FTNWBundle:Editor:echomailList, page: 1 }
     requirements:
         group_id: \d+
+        page: \d+
+
+fidonews_group_listall:
+    path: /echo/{group_id}/listall/{page}
+    defaults: { _controller: FTNWBundle:Editor:echomailList, all: true, page: 1 }
+    requirements:
+        group_id: \d+
+        page: \d+
 
 fidonews_list_ops:
     path: /echo/{group_id}/list/operations
@@ -52,6 +60,12 @@ fidonews_post:
 
 fidonews_reply:
     path: /echo/{id}/reply
+    defaults: { _controller: FTNWBundle:Editor:reply }
+    requirements:
+        id: \d+
+
+fidonews_forward:
+    path: /echo/{id}/forward
     defaults: { _controller: FTNWBundle:Editor:reply }
     requirements:
         id: \d+

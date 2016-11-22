@@ -12,7 +12,7 @@
                 <li><a href="#"><span class="glyphicon glyphicon-forward"></span> Forward message</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="{{ path("fidonews_group_list",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-th-list"></span> Unseen messages list</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-list"></span> All messages list</a></li>
+                <li><a href="{{ path("fidonews_group_listall",{'group_id':group_current.id}) }}"><span class="glyphicon glyphicon-list"></span> All messages list</a></li>
             </ul>
         </div>
     {% endif %}

@@ -74,17 +74,45 @@ class EditorController extends Controller
         $cache->delete($this->getUser()->getId().'.areas');
         return $this->redirectToRoute('fidonews_group',['group_id'=>$group_id]);
     }
-    public function echomailListAction($group_id, Request $request) {
+
+    public function echomailListAction($group_id, $all=false, Request $request) {
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
-        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.subject,m.hDate,p.id as pid")
+
+        // Count total records for pagination
+        $totalRecords = $qb->select($qb->expr()->count('mp'))
+            ->from('FTNWBundle:PointMessage', 'mp')
+            ->where('mp.area = :area_id')
+            ->andWhere('mp.point = :point_id')
+            ->setParameter('area_id',$group_id)
+            ->setParameter('point_id',$this->getUser()->getId())
+            ->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true, 1800)
+            ->getSingleScalarResult();
+
+        // Init paginator
+        $paginator = $this->paginate(
+            $totalRecords,
+            $pageNumber = $request->get('page'),
+            $onPage=100,
+            'list'
+        );
+
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.hToFtn,m.subject,m.hDate,p.id as pid,p.seen")
             ->from("FTNWBundle:PointMessage","p")
             ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
             ->where("p.point = :point_id")
             ->andWhere("p.area = :area_id")
-            ->andWhere("p.seen = 0")
-            ->orderBy("m.hDate","asc")
+            ->orderBy("m.hDate","desc")
+            ->setMaxResults($paginator->limit)
+            ->setFirstResult($paginator->offset)
             ->setParameter("point_id",$this->getUser()->getId())
             ->setParameter("area_id",$group_id);
+
+        if (!$all) {
+            $qb->andWhere("p.seen = 0");
+        }
         $pm = $qb->getQuery()->getResult();
 
         $groups = $this->separatePointGroups();
@@ -96,6 +124,7 @@ class EditorController extends Controller
             'group_current' => $this->getDoctrine()->getRepository("FTNWBundle:Echoarea")->find($group_id),
             'netmail_unread' => $this->getPointUnreadNetmail(),
             'messages' => $pm,
+            'pager' => $paginator->pageList,
         ));
     }
     public function netmailReplyAction(Netmail $message,Request $request) {
@@ -490,7 +519,7 @@ class EditorController extends Controller
         $nm = explode(" ",$from,2);
         $new_quote = " ";
         foreach ($nm as $name) {
-            $new_quote .= substr($name,0,1);
+            $new_quote .= mb_substr($name,0,1);
         }
         $new_quote .= "> ";
 
@@ -792,12 +821,25 @@ class EditorController extends Controller
     private function discountCachedGroup($group_id) {
         $cache = new ApcuCache();
         if ($areacache = $cache->fetch($this->getUser()->getId().'.areas')) {
-            array_walk($areacache,function(&$item,$idx,$group_id){
-                if ($item['id']==$group_id && $item['cnt']>0) {
-                    $item['cnt']--;
+            $data = array('group'=>$group_id,'user'=>$this->getUser()->getId());
+            try {
+            array_walk($areacache,function(&$item,$idx,$data){
+                if ($item['id']==$data['group']) {
+                    if ($item['cnt']>0) {
+                        $item['cnt']--;
+                    }
+                    if ($item['cnt'] == 0) {
+                        //$cache = new ApcuCache();
+                        //$cache->delete($data['user'].'.areas');
+                        throw new \Exception();
+                    }
                 }
-            },$group_id);
+            },$data);
             $cache->save($this->getUser()->getId().'.areas',$areacache,600);
+
+            } catch (\Exception $e) {
+              $cache->delete($this->getUser()->getId().'.areas');
+            }
         }
     }
 
@@ -867,5 +909,82 @@ class EditorController extends Controller
         }
     }
 
+    /**
+     * @param $totalRecords
+     * @param $pageNumber
+     * @param $onPage
+     * @param string $navType [list/pager/blog]
+     * @param bool $useHex [true/false] page number is HEX or DEC
+     * @param bool $availZero
+     * @param bool $showMax
+     * @return \stdClass
+     */
+    private function paginate ($totalRecords,$pageNumber,$onPage,$navType='list',$useHex=false,$availZero=false,$showMax=false) {
+        if ($useHex && ctype_xdigit($pageNumber)) {
+            $pageNumber = hexdec($pageNumber);
+        }
+
+        if ($availZero) $backStep = 0;
+        else $backStep = 1;
+        if ($pageNumber<$backStep) throw $this->createNotFoundException('Invalid page number');
+
+        $p = new \stdClass();
+        $p->limit = $onPage;
+        $p->currentPage = $pageNumber;
+        $p->totalPages = ceil($totalRecords/$p->limit);
+        if ($p->totalPages-1+$backStep<$pageNumber) throw $this->createNotFoundException('Invalid page number');
+        $p->offset = ($p->currentPage-$backStep)*$p->limit;
+        $p->pageList = new \Doctrine\Common\Collections\ArrayCollection();
+
+        // Default pager [1][2][3][etc..]
+        if ($navType == 'list') {
+            // Page numbers iteration
+            for ($i=$backStep;$i<$p->totalPages+$backStep;$i++) {
+
+                // Page previous
+                if ($p->currentPage>$backStep && $i+1==$p->currentPage) {
+                    if ($useHex) $linkTo = dechex($p->currentPage-1);
+                    else $linkTo = $p->currentPage-1;
+                    $p->pageList->add(['link'=>$linkTo,'alt'=>"&larr;&nbsp;".$linkTo,'state'=>'']);
+                    // Page current
+                } elseif ($p->currentPage == $i) {
+                    if ($useHex) $linkTo = dechex($i);
+                    else $linkTo = $i;
+                    $p->pageList->add(['link'=>$linkTo,'alt'=>$linkTo,'state'=>'active']);
+                    // Page next
+                } elseif ($p->currentPage+1<$p->totalPages && $i==$p->currentPage+1) {
+                    if ($useHex) $linkTo = dechex($p->currentPage+1);
+                    else $linkTo = $p->currentPage+1;
+                    $p->pageList->add(['link'=>$linkTo,'alt'=>$linkTo.'&nbsp;&rarr;','state'=>'']);
+                } else {
+                    if ($useHex) $linkTo = dechex($i);
+                    else $linkTo = $i;
+                    $p->pageList->add(['link'=>$linkTo,'alt'=>$linkTo,'state'=>'']);
+                }
+            }
+            // PageByPage [Previos][Next]
+        } elseif ($navType == 'pager') {
+            // BlogStyle pager [Older][Newer]
+        } elseif ($navType == 'blog') {
+            // Go older c:1 -> 2
+            if ($p->currentPage+1<$p->totalPages) {
+                if ($useHex) $linkTo = dechex($p->currentPage+1);
+                else $linkTo = $p->currentPage+1;
+                $p->pageList->add(['link'=>$linkTo,'alt'=>'&larr; page.'.$linkTo,'state'=>'']);
+            }
+            // Show current
+            if ($useHex) $linkTo = dechex($p->currentPage);
+            else $linkTo = $p->currentPage;
+            $p->pageList->add(['link'=>$linkTo,'alt'=>"".$linkTo,'state'=>'disabled']);
+            // Go newer c:2 -> 1
+            if ($p->currentPage-1>=$backStep) {
+                if ($useHex) $linkTo = dechex($p->currentPage-1);
+                else $linkTo = $p->currentPage-1;
+                $p->pageList->add(['link'=>$linkTo,'alt'=>"page.".$linkTo.' &rarr;','state'=>'']);
+            }
+        }
+
+        return $p;
+    }
 
 }

@@ -34,9 +34,12 @@
                             </tr>
                             </thead>
                             {% for pm in messages %}
-                            <tr class="default">
+                            <tr class="default" {% if not pm.seen %} style="font-weight: bold;"{% endif %}>
                                 <td><input type="checkbox" class="msg_check" name="unreads[{{ pm.pid }}]"></td>
-                                <td>{{ pm.hFrom }} <abbr title="{{ pm.hFrom }}">{{ pm.hFromFtn }}</abbr></td>
+                                <td>
+                                    {{ pm.hFrom }} <abbr title="{{ pm.hFrom }}">{{ pm.hFromFtn }}</abbr><br>
+                                    <span class="glyphicon glyphicon-menu-right"></span> {{ pm.hTo }} <abbr title="{{ pm.hTo }}">{{ pm.hToFtn }}</abbr><br>
+                                </td>
                                 <td><a href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':pm.id}) }}">{{ pm.subject }}</a></td>
                                 <td>{{ pm.hDate|date('d M Y H:i') }}</td>
                             </tr>
@@ -44,11 +47,19 @@
                         </table>
                         </form>
                     </div>
+                        <br>
+                        <nav><ul class="pager">
+                                {% for bp in pager %}
+                                    <li class="{{ bp.state }}"><a href="{{ path('fidonews_group_listall',{'group_id':group_current.id,'page':bp.link}) }}">{{ bp.alt|raw }}</a></li>
+                                {% endfor %}
+                            </ul></nav>
+
                     {% else %}
                     <div class="jumbotron">
                         <h1>No unread messages</h1>
                     </div>
                     {% endif %}
+
                 {% else %}
                     <div class="jumbotron">
                         <h1>Please select echoarea to read</h1>
