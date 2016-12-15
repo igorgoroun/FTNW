@@ -850,9 +850,9 @@ class EditorController extends Controller
         }
         //if (count($attachment)>0) dump($uue_data);
 
-        /*if (preg_match("/begin \d{3,} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
+        if (preg_match("/begin \d{3,} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
             $message->setBody(str_replace($data[2],"\n-UUE/cutted-\n",$message->getBody()));
-        }*/
+        }
 
 
         // return render
