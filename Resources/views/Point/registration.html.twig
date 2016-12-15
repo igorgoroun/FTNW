@@ -46,8 +46,9 @@
                 <div class="form-group">
                     <div class="col-sm-offset-5 col-sm-7">
                         <div class="checkbox">
-                            <label for="">
-                                {{ form_widget(form.classic) }} {{ form_label(form.classic) }}
+                            <label for="{{ form.classic.vars.id }}">
+                                {{ form_widget(form.classic) }}
+                                {{ form.classic.vars.label }}
                             </label>
                         </div>
                     </div>

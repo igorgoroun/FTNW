@@ -21,8 +21,92 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EditorController extends Controller
 {
-    public function netmailListAction(Request $request) {
+    public function netmailListOpsAction(Request $request) {
+        if ($request->request->get('type')=='markread' && count($request->request->get('unreads'))>0) {
+            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
+            $qb->update("FTNWBundle:Netmail","p")->set('p.seen',true)
+                ->where('p.id IN (:ids)')
+                ->andWhere('p.point = :point_id')
+                ->setParameter('point_id',$this->getUser()->getId())
+                ->setParameter('ids',array_keys($request->request->get('unreads')));
+            if ($qb->getQuery()->execute()) {
+                $this->addFlash('notice','Selected messages marked as read');
+            } else {
+                $this->addFlash('error','Cannot mark selected messages as read');
+            }
 
+        } elseif ($request->request->get('type')=='delete' && count($request->request->get('unreads'))>0) {
+            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
+            $qb->delete()->from("FTNWBundle:Netmail",'p')
+                ->where('p.id IN (:ids)')
+                ->andWhere('p.point = :point_id')
+                ->setParameter('point_id',$this->getUser()->getId())
+                ->setParameter('ids',array_keys($request->request->get('unreads')));
+            if ($qb->getQuery()->execute()) {
+                $this->addFlash('notice','Selected messages deleted');
+            } else {
+                $this->addFlash('error','Cannot delete selected messages');
+            }
+
+        }
+        return $this->redirectToRoute('netmail');
+    }
+    public function netmailListAction($all=false, Request $request) {
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+
+        // Count total records for pagination
+        $qb->select($qb->expr()->count('nm'))
+            ->from('FTNWBundle:Netmail', 'nm')
+            ->where('nm.point = :point_id')
+            ->setParameter('point_id',$this->getUser()->getId());
+        if (!$all) {
+            $qb->andWhere("nm.seen = 0");
+        }
+
+        $totalRecords = $qb->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true, 1800)
+            ->getSingleScalarResult();
+
+        // Init paginator
+        $paginator = $this->paginate(
+            $totalRecords,
+            $pageNumber = $request->get('page'),
+            $onPage=100,
+            'list'
+        );
+
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        $qb->select("m.id,m.hFrom,m.hFromFtn,m.hTo,m.hToFtn,m.subject,m.hDate,m.seen")
+            ->from("FTNWBundle:Netmail","m")
+            ->where("m.point = :point_id")
+            ->orderBy("m.hDate","desc")
+            ->setMaxResults($paginator->limit)
+            ->setFirstResult($paginator->offset)
+            ->setParameter("point_id",$this->getUser()->getId());
+
+        if (!$all) {
+            $qb->andWhere("m.seen = 0");
+        }
+
+        $pm = $qb->getQuery()->getResult();
+
+        if (!$all && count($pm)==0) {
+            $this->addFlash('notice','You have no unseen messages');
+            return $this->redirectToRoute('netmail');
+        }
+
+        $groups = $this->separatePointGroups();
+
+        // return render
+        return $this->render("FTNWBundle:Editor:netmail-list.html.twig", array(
+            'groups' => $groups['all'],
+            'groups_visible' => $groups['visible'],
+            'groups_more' => $groups['more'],
+            'messages' => $pm,
+            'netmail_unread' => $this->getPointUnreadNetmail(),
+            'pager' => $paginator->pageList,
+        ));
     }
 
     public function bookmarkEchomailAction(Request $request) {
@@ -79,13 +163,17 @@ class EditorController extends Controller
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
 
         // Count total records for pagination
-        $totalRecords = $qb->select($qb->expr()->count('mp'))
+        $qb->select($qb->expr()->count('mp'))
             ->from('FTNWBundle:PointMessage', 'mp')
             ->where('mp.area = :area_id')
             ->andWhere('mp.point = :point_id')
             ->setParameter('area_id',$group_id)
-            ->setParameter('point_id',$this->getUser()->getId())
-            ->getQuery()
+            ->setParameter('point_id',$this->getUser()->getId());
+        if (!$all) {
+            $qb->andWhere("mp.seen = 0");
+        }
+        
+        $totalRecords = $qb->getQuery()
             ->useQueryCache(true)
             ->useResultCache(true, 1800)
             ->getSingleScalarResult();
@@ -285,6 +373,9 @@ class EditorController extends Controller
         ));
     }
     public function netmailcheckAction() {
+        if ($this->getUser()->getAslistNetmail()) {
+            return $this->redirectToRoute('netmail_list_all');
+        }
         // Find first UNSEEN message
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
         $qb->select("n.id")
@@ -551,13 +642,14 @@ class EditorController extends Controller
         $dashboard_list[0]['desc'] = "Netmail";
         $dashboard_list[0]['link'] = $this->generateUrl('netmail');
         // areas
+        /*
         for ($i=1;$i<3;$i++) {
             if (count($groups) > $i-1) {
                 $dashboard_list[$i]['cnt'] = $groups['visible'][$i-1]['cnt'];
                 $dashboard_list[$i]['desc'] = $groups['visible'][$i-1]['name'];
                 $dashboard_list[$i]['link'] = $this->generateUrl('fidonews_group',array('group_id'=>$groups['visible'][$i-1]['id']));
             }
-        }
+        }*/
 
         // render template
         return $this->render('FTNWBundle:Editor:groups.html.twig', array(
@@ -571,6 +663,10 @@ class EditorController extends Controller
     }
 
     public function groupAction($group_id) {
+        if ($this->getUser()->getAslistEchomail()) {
+            return $this->redirectToRoute('fidonews_group_listall',['group_id'=>$group_id]);
+        }
+
         // Find first UNSEEN message
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
         $qb->select("m.id")
@@ -737,14 +833,27 @@ class EditorController extends Controller
             }
         }
 
-        /*$attachment = false;
-        if (preg_match("/begin \d{3} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
-            $attachment = array('file'=>$data[1],'content'=>convert_uudecode($data[2]));
+        $attachment = false;
+        $att_check = preg_match_all("/begin \d{3,} (.+)([\w\W]+)end/",$message->getBody(),$uue_data,PREG_SET_ORDER);
+        if ($att_check && $att_check>0) {
+            $num = 0;
+            $attachment = [];
+            foreach ($uue_data as $data) {
+                $attachment[] = [
+                    'file' => $data[1],
+                    //'content' => convert_uudecode($data[2]),
+                    'num' => $num,
+                    'mid' => $message->getId(),
+                ];
+                $num++;
+            }
         }
-        if (preg_match("/begin \d{3} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
+        //if (count($attachment)>0) dump($uue_data);
+
+        /*if (preg_match("/begin \d{3,} (.+)([\w\W]+)end/",$message->getBody(),$data)) {
             $message->setBody(str_replace($data[2],"\n-UUE/cutted-\n",$message->getBody()));
-        }
-        */
+        }*/
+
 
         // return render
         return $this->render("FTNWBundle:Editor:groups.html.twig", array(
@@ -756,6 +865,7 @@ class EditorController extends Controller
             'pm' => $pm,
             'nav' => $navigation,
             'netmail_unread' => $this->getPointUnreadNetmail(),
+            'attachments' => $attachment,
         ));
     }
 
@@ -932,6 +1042,7 @@ class EditorController extends Controller
         $p->limit = $onPage;
         $p->currentPage = $pageNumber;
         $p->totalPages = ceil($totalRecords/$p->limit);
+        if ($p->totalPages == 0) $p->totalPages = 1;
         if ($p->totalPages-1+$backStep<$pageNumber) throw $this->createNotFoundException('Invalid page number');
         $p->offset = ($p->currentPage-$backStep)*$p->limit;
         $p->pageList = new \Doctrine\Common\Collections\ArrayCollection();

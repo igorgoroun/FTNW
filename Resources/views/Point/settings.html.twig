@@ -51,6 +51,26 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <div class="checkbox">
+                            <label for="{{ form.aslist_netmail.vars.id }}">
+                                {{ form_widget(form.aslist_netmail) }}
+                                {{ form.aslist_netmail.vars.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <div class="checkbox">
+                            <label for="{{ form.aslist_echomail.vars.id }}">
+                                {{ form_widget(form.aslist_echomail) }}
+                                {{ form.aslist_echomail.vars.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <div class="col-sm-offset-4 col-sm-8">

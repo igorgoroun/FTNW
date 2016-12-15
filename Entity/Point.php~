@@ -537,4 +537,43 @@ class Point implements UserInterface, \Serializable
         // You *may* need a real salt if you choose a different encoder.
         return null;
     }
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $netmail;
+
+
+    /**
+     * Add netmail
+     *
+     * @param \IgorGoroun\FTNWBundle\Entity\Netmail $netmail
+     *
+     * @return Point
+     */
+    public function addNetmail(\IgorGoroun\FTNWBundle\Entity\Netmail $netmail)
+    {
+        $this->netmail[] = $netmail;
+
+        return $this;
+    }
+
+    /**
+     * Remove netmail
+     *
+     * @param \IgorGoroun\FTNWBundle\Entity\Netmail $netmail
+     */
+    public function removeNetmail(\IgorGoroun\FTNWBundle\Entity\Netmail $netmail)
+    {
+        $this->netmail->removeElement($netmail);
+    }
+
+    /**
+     * Get netmail
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getNetmail()
+    {
+        return $this->netmail;
+    }
 }

@@ -61,6 +61,19 @@
                                             </ul>
                                         </div>
                                     {% endif %}
+                                    {% if attachments %}
+                                        <div class="btn-group pull-right" style="margin-right: 1em;" role="group">
+                                            <button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="glyphicon glyphicon-paperclip"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                {% for att in attachments %}
+                                                    <li><a href="{{ path("uuview_first",{'mid':att.mid,'num':att.num}) }}"><span class="glyphicon glyphicon-save"></span> {{ att.file }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+
+                                    {% endif %}
                                 </td>
                             </tr>
                         </table>
@@ -122,6 +135,18 @@
                             </div>
                         </div>
                         {% endfor %}
+                        {% for grp in groups %}
+                            {% if grp.cnt > 0 %}
+                            <div class="col-sm-4">
+                                <div class="list-group">
+                                    <a href="{{ path('fidonews_group',{'group_id':grp.id}) }}" class="list-group-item">
+                                        <h2 class="list-group-item-heading">{{ grp.cnt }} <small>unread</small></h2>
+                                        <p class="list-group-item-text">{{ grp.name }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>
@@ -133,6 +158,15 @@
     {{ parent() }}
     <script>
         $(function(){
+          {% if nav is defined %}
+            $(".message_viewer").touchwipe({
+                {% if nav.next %}wipeLeft: function() { location.href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}"; },{% endif %}
+                {% if nav.prev %}wipeRight: function() { location.href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}"; },{% endif %}
+                min_move_x: 20,
+                min_move_y: 20,
+                preventDefaultEvents: true
+            });
+          {% endif %}
             $(".echomail-bookmark").click(function(){
                 $.ajax({
                     type: "POST",

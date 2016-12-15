@@ -44,6 +44,16 @@ IgorGoroun\FTNWBundle\Entity\Point:
             type: string
             length: '128'
             nullable: true
+        aslist_netmail:
+            type: boolean
+            nullable: false
+            options:
+                default: false
+        aslist_echomail:
+            type: boolean
+            nullable: false
+            options:
+                default: false
         active:
             type: boolean
             nullable: false

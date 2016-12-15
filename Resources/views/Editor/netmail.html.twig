@@ -40,7 +40,23 @@
                             </tr>
                             <tr class="default">
                                 <td class="text-right"><strong>Subject:</strong></td>
-                                <td colspan="2">{{ message.m_subject }}<a class="btn btn-primary btn-xs pull-right" role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders">Src</a></td>
+                                <td colspan="2">{{ message.m_subject }}
+                                    <div class="btn-group pull-right" role="group">
+                                        <button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="glyphicon glyphicon-menu-hamburger"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li><a href="{{ path('netmail_post') }}"><span class="glyphicon glyphicon-plus"></span> Write message</a></li>
+                                            <li><a href="{{ path('netmail_reply',{'id':message.m_id}) }}"><span class="glyphicon glyphicon-share-alt"></span> Reply to message</a></li>
+                                            <li><a href="#"><span class="glyphicon glyphicon-forward"></span> Forward message</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="{{ path("netmail_list") }}"><span class="glyphicon glyphicon-th-list"></span> Unseen messages list</a></li>
+                                            <li><a href="{{ path("netmail_list_all") }}"><span class="glyphicon glyphicon-list"></span> All messages list</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a role="button" data-toggle="collapse" href="#collapseHeaders" aria-expanded="false" aria-controls="collapseHeaders"><span class="glyphicon glyphicon-console"></span> Message headers</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
                     </div>

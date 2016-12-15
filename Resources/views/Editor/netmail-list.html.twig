@@ -1,0 +1,81 @@
+{% extends 'FTNWBundle:Layout:main.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{  parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'FTNWBundle:Editor:netlistmenu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                    <div class="page-header hidden-xs">
+                        <h1 class="bloghead">
+                            Netmail <small>message list</small>
+                        </h1>
+                    </div>
+                    {% if messages %}
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <!--<div class="panel-heading">Panel heading</div>-->
+                        <form action="{{ path("netmail_list_ops") }}" method="post">
+                        <table class="table table-condensed">
+                            <thead>
+                            <tr class="active">
+                                <th><input type="checkbox" id="msgselector"></th>
+                                <th colspan="3">
+                                    <button type="submit" name="type" value="markread" id="msg_markread" class="btn btn-primary btn-xs">Mark read</button>
+                                    <button type="submit" name="type" value="delete" id="msg_drop" class="btn btn-primary btn-xs">Delete</button>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for pm in messages %}
+                            <tr class="default" {% if not pm.seen %} style="font-weight: bold;"{% endif %}>
+                                <td><input type="checkbox" class="msg_check" name="unreads[{{ pm.id }}]"></td>
+                                <td>
+                                    {{ pm.hFrom }} <abbr title="{{ pm.hFrom }}">{{ pm.hFromFtn }}</abbr><br>
+                                    <span class="glyphicon glyphicon-menu-right"></span> {{ pm.hTo }} <abbr title="{{ pm.hTo }}">{{ pm.hToFtn }}</abbr><br>
+                                </td>
+                                <td><a href="{{ path('netmail_message',{'netmail_id':pm.id}) }}">{{ pm.subject }}</a></td>
+                                <td>{{ pm.hDate|date('d M Y H:i') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        </form>
+                    </div>
+                        <br>
+                        <nav><ul class="pager">
+                                {% for bp in pager %}
+                                    <li class="{{ bp.state }}"><a href="{{ path('netmail_list_all',{'page':bp.link}) }}">{{ bp.alt|raw }}</a></li>
+                                {% endfor %}
+                            </ul></nav>
+
+                    {% else %}
+                    <div class="jumbotron">
+                        <h1>No messages</h1>
+                    </div>
+                    {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+    $(function(){
+        $('#msgselector').change(function(){
+            if (this.checked) {
+                $(".msg_check").prop('checked',true);
+            } else {
+                $(".msg_check").prop('checked',false);
+            }
+        });
+    });
+    </script>
+{% endblock %}

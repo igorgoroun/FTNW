@@ -85,8 +85,22 @@ netmail:
     defaults: { _controller: FTNWBundle:Editor:netmailcheck }
 
 netmail_list:
-    path: /netmail/list
-    defaults: { _controller: FTNWBundle:Editor:netmailList }
+    path: /netmail/list/{page}
+    defaults: { _controller: FTNWBundle:Editor:netmailList, page: 1 }
+    requirements:
+        page: \d+
+
+netmail_list_all:
+    path: /netmail/listall/{page}
+    defaults: { _controller: FTNWBundle:Editor:netmailList, all: true, page: 1 }
+    requirements:
+        page: \d+
+
+netmail_list_ops:
+    path: /netmail/list/operations
+    defaults: { _controller: FTNWBundle:Editor:netmailListOps }
+    requirements:
+        methods: POST
 
 netmail_message:
     path: /netmail/{netmail_id}
@@ -149,6 +163,13 @@ reader_message_list:
     requirements:
         page: \d+
         area: \d+
+
+uuview_first:
+    path: /uuview/{mid}/{num}
+    defaults: { _controller: FTNWBundle:UUView:echoMessage, num: 0 }
+    requirements:
+        mid: \d+
+        num: \d+
 
 rest_uplink_new:
     path: /api/uplink/new

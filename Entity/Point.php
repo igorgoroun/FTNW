@@ -576,4 +576,62 @@ class Point implements UserInterface, \Serializable
     {
         return $this->netmail;
     }
+    /**
+     * @var boolean
+     */
+    private $aslist_netmail = false;
+
+    /**
+     * @var boolean
+     */
+    private $aslist_echomail = false;
+
+
+    /**
+     * Set aslistNetmail
+     *
+     * @param boolean $aslistNetmail
+     *
+     * @return Point
+     */
+    public function setAslistNetmail($aslistNetmail)
+    {
+        $this->aslist_netmail = $aslistNetmail;
+
+        return $this;
+    }
+
+    /**
+     * Get aslistNetmail
+     *
+     * @return boolean
+     */
+    public function getAslistNetmail()
+    {
+        return $this->aslist_netmail;
+    }
+
+    /**
+     * Set aslistEchomail
+     *
+     * @param boolean $aslistEchomail
+     *
+     * @return Point
+     */
+    public function setAslistEchomail($aslistEchomail)
+    {
+        $this->aslist_echomail = $aslistEchomail;
+
+        return $this;
+    }
+
+    /**
+     * Get aslistEchomail
+     *
+     * @return boolean
+     */
+    public function getAslistEchomail()
+    {
+        return $this->aslist_echomail;
+    }
 }
