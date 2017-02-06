@@ -192,14 +192,16 @@ class EditorController extends Controller
             ->leftJoin("FTNWBundle:MessageCache","m",'WITH',"m.id=p.message")
             ->where("p.point = :point_id")
             ->andWhere("p.area = :area_id")
-            ->orderBy("m.hDate","desc")
             ->setMaxResults($paginator->limit)
             ->setFirstResult($paginator->offset)
             ->setParameter("point_id",$this->getUser()->getId())
             ->setParameter("area_id",$group_id);
 
         if (!$all) {
+            $qb->orderBy("m.hDate","desc");
             $qb->andWhere("p.seen = 0");
+        } else {
+            $qb->orderBy("m.hDate","asc");
         }
         $pm = $qb->getQuery()->getResult();
 
