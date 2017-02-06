@@ -198,10 +198,10 @@ class EditorController extends Controller
             ->setParameter("area_id",$group_id);
 
         if (!$all) {
-            $qb->orderBy("m.hDate","desc");
+            $qb->orderBy("m.hDate","asc");
             $qb->andWhere("p.seen = 0");
         } else {
-            $qb->orderBy("m.hDate","asc");
+            $qb->orderBy("m.hDate","desc");
         }
         $pm = $qb->getQuery()->getResult();
 
