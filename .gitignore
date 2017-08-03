@@ -9,3 +9,5 @@
 # Config file
 Resources/config/parameters.yml
 /vendor/
+.phpintel
+.idea

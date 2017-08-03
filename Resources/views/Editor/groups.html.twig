@@ -166,6 +166,20 @@
                 min_move_y: 20,
                 preventDefaultEvents: true
             });
+            // Bind keyboard shortcuts for next message
+            {% if nav.next %}
+            Mousetrap.bind(['command+right', 'ctrl+right', 'right'], function() { 
+                location.href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.next}) }}";
+                console.log('Next message'); 
+            });
+            {% endif %}
+            // Bind keyboard shortcuts for previous message
+            {% if nav.prev %}
+            Mousetrap.bind(['command+left', 'ctrl+left', 'left'], function() { 
+                location.href="{{ path('fidonews_message',{'group_id':group_current.id,'message_number':nav.prev}) }}";
+                console.log('Previous message'); 
+            });
+            {% endif %}
           {% endif %}
             $(".echomail-bookmark").click(function(){
                 $.ajax({
